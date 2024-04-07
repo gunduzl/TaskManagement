@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskmanager.ui.theme.TaskManagerTheme
-
+// hello world
 data class BottomNavigationItem(
     val title: String,
     val selectedIcon: ImageVector,
@@ -38,7 +38,9 @@ data class BottomNavigationItem(
     val hasNews: Boolean,
     val badgeCount: Int? = null
 )
+
 // ASDGAHJNSD
+
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
