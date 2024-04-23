@@ -17,12 +17,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.screens.HomeScreen
+import com.example.taskmanager.screens.ManagerHomeScreen
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ProfileScreen
 
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation(navControl: NavController){
     val navController = rememberNavController()
     
     Scaffold(
@@ -66,7 +67,8 @@ fun AppNavigation(){
                 LeaderBoardScreen()
             }
             composable(route = Screens.HomeScreen.name){
-                HomeScreen()
+                //HomeScreen()
+                ManagerHomeScreen()
             }
             composable(route = Screens.ProfileScreen.name){
                 ProfileScreen()
