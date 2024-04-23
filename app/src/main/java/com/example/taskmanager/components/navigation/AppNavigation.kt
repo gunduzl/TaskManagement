@@ -67,8 +67,8 @@ fun AppNavigation(navControl: NavController){
                 LeaderBoardScreen()
             }
             composable(route = Screens.HomeScreen.name){
-                //HomeScreen()
-                ManagerHomeScreen()
+                HomeScreen()
+                //ManagerHomeScreen()
             }
             composable(route = Screens.ProfileScreen.name){
                 ProfileScreen()
