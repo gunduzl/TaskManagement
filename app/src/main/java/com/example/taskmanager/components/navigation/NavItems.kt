@@ -28,5 +28,15 @@ val listOfNavItems : List<NavItem> = listOf(
         label = "Profile",
         icon = Icons.Default.Person,
         route = Screens.ProfileScreen.name
-    )
+    ),
+    NavItem(
+        label = "SystemAdministrator",
+        icon = Icons.Default.Person,
+        route = Screens.SystemAdministratorScreen.name
+    )/*
+    NavItem(
+        label = "Manager",
+        icon = Icons.Default.Person,
+        route = Screens.ManagerHomeScreen.name
+    )*/
 )
