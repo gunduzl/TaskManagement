@@ -26,7 +26,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +43,7 @@ import androidx.compose.ui.graphics.SolidColor
 
 @Composable
 fun SystemAdministratorScreen(){
+
     MaterialTheme{
         Column(
             modifier = Modifier
@@ -71,7 +81,15 @@ fun SystemAdministratorScreen(){
 //deneme
 @Composable
 fun CreateEmployee(){
+    var createEmployee by remember { mutableStateOf(false) }
+    var employeeId by remember { mutableStateOf("") }
+    var employeeName by remember { mutableStateOf("") }
+    var employeeSurname by remember { mutableStateOf("") }
+    var employeeRole by remember { mutableStateOf("") }
+    var employeeDepartment by remember { mutableStateOf("") }
+    var employeeType by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var dropdownExpanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
@@ -79,7 +97,7 @@ fun CreateEmployee(){
             .fillMaxWidth()
             .padding(10.dp)
             .height(60.dp)
-            .clickable { showDialog = true },
+            .clickable { showDialog = true ; createEmployee= true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
 
@@ -96,10 +114,132 @@ fun CreateEmployee(){
         }
 
     }
+    if (createEmployee) {
+        AlertDialog(
+            onDismissRequest = { createEmployee = false },
+            title = { Text("Add New Employee", fontWeight = FontWeight.Bold) },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
+
+
+                ) {
+                    TextField(
+                        value = employeeId,
+                        onValueChange = { employeeId = it },
+                        label = { Text("Enter Empolyee ID:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+
+                    TextField(
+                        value = employeeName,
+                        onValueChange = { employeeName = it },
+                        label = { Text("Enter Employee Name:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
+                        modifier = Modifier.height(100.dp)
+
+                    )
+
+                    TextField(
+                        value = employeeSurname,
+                        onValueChange = { employeeSurname = it },
+                        label = { Text("Enter Employee Surname:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                    TextField(
+                        value = employeeDepartment,
+                        onValueChange = { employeeDepartment = it },
+                        label = { Text("Enter Employee Department:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                    TextField(
+                        value = employeeRole,
+                        onValueChange = { employeeRole = it },
+                        label = { Text("Enter Employee Role:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { dropdownExpanded = true }) {
+                        Text(
+                            text = "Select Employee Type:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeType.takeIf { it.isNotBlank() } ?: "Select Employee Type",
+
+                            )
+                    }
+                    DropdownMenu(expanded = dropdownExpanded,
+                        onDismissRequest = { /*TODO*/ },
+                        modifier = Modifier) {
+
+                        DropdownMenuItem(text = { Text("Staff")}, onClick = {
+                            employeeType = "Staff"
+                            dropdownExpanded = false
+                        })
+                        DropdownMenuItem(text = { Text("Manager")}, onClick = {
+                            employeeType = "Manager"
+                            dropdownExpanded = false
+                        })
+                        DropdownMenuItem(text = { Text("CTO")}, onClick = {
+                            employeeType = "CTO"
+                            dropdownExpanded = false
+                        })
+                    }
+
+                }
+
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        createEmployee = false
+                        employeeId = ""
+                        employeeName = ""
+                        employeeSurname = ""
+                        employeeDepartment = ""
+                        employeeRole = ""
+                        employeeType = ""
+                        dropdownExpanded = false
+                    },
+                ) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        createEmployee = false
+                        employeeId = ""
+                        employeeName = ""
+                        employeeSurname = ""
+                        employeeDepartment = ""
+                        employeeRole = ""
+                        employeeType = ""
+                        dropdownExpanded = false
+
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            }
+
+        )
+    }
 }
 
 @Composable
 fun RemoveEmployee(){
+    var removeEmployee by remember { mutableStateOf(false) }
+    var employeeId by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -108,7 +248,7 @@ fun RemoveEmployee(){
             .fillMaxWidth()
             .padding(10.dp)
             .height(60.dp)
-            .clickable { showDialog = true },
+            .clickable { showDialog = true; removeEmployee= true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
 
@@ -125,10 +265,57 @@ fun RemoveEmployee(){
         }
 
     }
+    if (removeEmployee ) {
+        AlertDialog(
+            onDismissRequest = { removeEmployee = false },
+            title = { Text("Remove Employee", fontWeight = FontWeight.Bold) },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
+
+
+                ) {
+                    TextField(
+                        value = employeeId,
+                        onValueChange = { employeeId = it },
+                        label = { Text("Enter Employee ID:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        employeeId = ""
+                        removeEmployee=false
+                    },
+                ) {
+                    Text("Remove")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        employeeId = ""
+                        removeEmployee=false
+
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun ChangeEmployeeRole(){
+    var changeEmployeeRole by remember { mutableStateOf(false) }
+    var employeeId by remember { mutableStateOf("") }
+    var employeeRole by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -137,7 +324,7 @@ fun ChangeEmployeeRole(){
             .fillMaxWidth()
             .padding(10.dp)
             .height(60.dp)
-            .clickable { showDialog = true },
+            .clickable { showDialog = true; changeEmployeeRole= true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
 
@@ -154,9 +341,61 @@ fun ChangeEmployeeRole(){
         }
 
     }
+    if (changeEmployeeRole ) {
+        AlertDialog(
+            onDismissRequest = { changeEmployeeRole = false },
+            title = { Text("Change Employee Role", fontWeight = FontWeight.Bold) },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
+
+
+                ) {
+                    TextField(
+                        value = employeeId,
+                        onValueChange = { employeeId = it },
+                        label = { Text("Enter Employee ID:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                    TextField(
+                        value = employeeRole,
+                        onValueChange = { employeeRole = it },
+                        label = { Text("Enter Employee Role:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        employeeId = ""
+                        changeEmployeeRole=false
+                    },
+                ) {
+                    Text("Change")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        employeeId = ""
+                        changeEmployeeRole=false
+
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 @Composable
 fun AddDepartment(){
+    var createDepartment by remember { mutableStateOf(false) }
+    var departmentName by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -165,7 +404,7 @@ fun AddDepartment(){
             .fillMaxWidth()
             .padding(10.dp)
             .height(60.dp)
-            .clickable { showDialog = true },
+            .clickable { showDialog = true ; createDepartment= true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
 
@@ -182,10 +421,56 @@ fun AddDepartment(){
         }
 
     }
+    if (createDepartment ) {
+        AlertDialog(
+            onDismissRequest = { createDepartment = false },
+            title = { Text("Add New Department ", fontWeight = FontWeight.Bold) },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .padding(5.dp, top =10.dp, bottom=10.dp)
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
+
+
+                ) {
+                    TextField(
+                        value = departmentName,
+                        onValueChange = { departmentName = it },
+                        label = { Text("Enter Department Name: ", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        departmentName = ""
+                        createDepartment=false
+                    },
+                ) {
+                    Text("Change")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        departmentName = ""
+                        createDepartment=false
+
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun DeleteDepartment(){
+    var deleteDepartment by remember { mutableStateOf(false) }
+    var departmentName by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -194,7 +479,7 @@ fun DeleteDepartment(){
             .fillMaxWidth()
             .padding(10.dp)
             .height(60.dp)
-            .clickable { showDialog = true },
+            .clickable { showDialog = true ; deleteDepartment= true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
 
@@ -208,8 +493,51 @@ fun DeleteDepartment(){
             contentAlignment = Alignment.BottomEnd
         ) {
 
-        } //condvkjf
+        }
 
+    }
+    if (deleteDepartment ) {
+        AlertDialog(
+            onDismissRequest = { deleteDepartment = false },
+            title = { Text("Delete Department", fontWeight = FontWeight.Bold) },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .padding(5.dp, top =10.dp, bottom=10.dp)
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
+
+
+                ) {
+                    TextField(
+                        value = departmentName,
+                        onValueChange = { departmentName = it },
+                        label = { Text("Enter Department Name:", fontWeight = FontWeight.Bold) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        departmentName = ""
+                        deleteDepartment=false
+                    },
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        departmentName = ""
+                        deleteDepartment=false
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
