@@ -34,55 +34,55 @@ import androidx.compose.ui.graphics.SolidColor
 
 @Composable
 fun SystemAdministratorScreen(){
-  MaterialTheme{
-      Column(
-          modifier = Modifier
-              .fillMaxHeight()
-              .width(800.dp)
-              .padding(top = 30.dp, start = 20.dp, end = 10.dp)
-          ,
-          horizontalAlignment = Alignment.Start,
-      ){
+    MaterialTheme{
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(800.dp)
+                .padding(top = 30.dp, start = 20.dp, end = 10.dp)
+            ,
+            horizontalAlignment = Alignment.Start,
+        ){
 
-          LazyColumn(
-              modifier = Modifier
-                  .padding(10.dp)
-                  .background(SolidColor(Color.White), shape = RoundedCornerShape(15.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .background(SolidColor(Color.White), shape = RoundedCornerShape(15.dp))
 
-          ) {
-              item{
-                  CreateEmployee()
-                  Spacer(modifier = Modifier.height(20.dp))
-                  RemoveEmployee()
-                  Spacer(modifier = Modifier.height(20.dp))
-                  ChangeEmployeeRole()
-                  Spacer(modifier = Modifier.height(20.dp))
-                  AddDepartment()
-                  Spacer(modifier = Modifier.height(20.dp))
-                  DeleteDepartment()
+            ) {
+                item{
+                    CreateEmployee()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    RemoveEmployee()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    ChangeEmployeeRole()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    AddDepartment()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    DeleteDepartment()
 
 
 
-              }
-          }
-      }
-  }
+                }
+            }
+        }
+    }
 }
 //deneme
 @Composable
 fun CreateEmployee(){
     var showDialog by remember { mutableStateOf(false) }
     Row(
-       modifier = Modifier
-           .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
-           .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
-           .fillMaxWidth()
-           .padding(10.dp)
-           .height(60.dp)
-           .clickable { showDialog = true },
+        modifier = Modifier
+            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .fillMaxWidth()
+            .padding(10.dp)
+            .height(60.dp)
+            .clickable { showDialog = true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
-        
+
     ){
         Text(text = "Create Employee", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
 
@@ -94,7 +94,7 @@ fun CreateEmployee(){
         ) {
 
         }
-        
+
     }
 }
 
@@ -208,7 +208,7 @@ fun DeleteDepartment(){
             contentAlignment = Alignment.BottomEnd
         ) {
 
-        }
+        } //condvkjf
 
     }
 }
