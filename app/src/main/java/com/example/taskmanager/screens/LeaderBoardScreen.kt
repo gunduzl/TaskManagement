@@ -28,19 +28,7 @@ import com.example.taskmanager.components.Staff
 
 @Composable
 fun LeaderBoardScreen() {
-        /*
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            Text(
-                text = "Leaderboard Screen",
-                fontFamily = FontFamily.Serif,
-                fontSize = 22.sp
-            )
-        }
-        */
+
     Column(
         modifier = Modifier
             .fillMaxWidth(1f)

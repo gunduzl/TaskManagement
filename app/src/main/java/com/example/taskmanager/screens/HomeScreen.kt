@@ -32,8 +32,8 @@ fun HomeScreen(){
         Button(onClick = { }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
         }
-        Pool("Open", Color(0xFFF0F8FF))
-        Pool("Active", Color(0xFFFFADB0))
+        Pool("Open", Color(0x666650a4))
+        Pool("Active", Color(0x666790a4))
     }
 
 }
