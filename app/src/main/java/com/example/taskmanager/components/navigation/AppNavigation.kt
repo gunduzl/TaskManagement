@@ -20,6 +20,7 @@ import com.example.taskmanager.screens.HomeScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ProfileScreen
+import com.example.taskmanager.screens.SystemAdministratorScreen
 
 
 @Composable
@@ -73,6 +74,13 @@ fun AppNavigation(navControl: NavController){
             composable(route = Screens.ProfileScreen.name){
                 ProfileScreen()
             }
+            composable(route = Screens.SystemAdministratorScreen.name){
+                SystemAdministratorScreen()
+            }
+            /*
+            composable(route = Screens.ManagerHomeScreen.name){
+                ManagerHomeScreen()
+            }*/
 
         }
         
