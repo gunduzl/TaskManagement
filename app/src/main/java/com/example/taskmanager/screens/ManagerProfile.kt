@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import MyTeam_A
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,11 +31,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.taskmanager.profileComponents.MyTasks
 
 
 @Composable
-fun ProfileScreen() {
+fun ManagerProfile() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,14 +51,14 @@ fun ProfileScreen() {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Profile Icon
-                    ProfileIconn(icon = Icons.Default.Person)
+                    ProfileIcon(icon = Icons.Default.Person)
 
                     Spacer(modifier = Modifier.width(25.dp))
 
                     // Manager Details
                     Column {
                         Text(
-                            text = "Staff Name",
+                            text = "Manager Name",
                             style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -127,13 +127,13 @@ fun ProfileScreen() {
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            MyTasks()
+            MyTeam_A()
         }
     }
 }
 
 @Composable
-fun ProfileIconn(icon: ImageVector) {
+fun ProfileIcon(icon: ImageVector) {
     Icon(
         imageVector = icon,
         contentDescription = "Profile Icon",
