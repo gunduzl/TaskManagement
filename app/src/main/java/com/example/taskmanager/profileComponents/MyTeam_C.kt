@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.ui.theme.customGreen
+import com.example.taskmanager.ui.theme.customPurple
 
 @Composable
 fun MyTeam_C() {
@@ -74,12 +76,11 @@ data class Staff(val name: String, val status: String, val task: String?, var st
 
 @Composable
 fun StaffffItem(staff: Staff) {
-    val statusColor = if (staff.status == "Busy") Color.Red else Color.Green
-
+    val statusColor = if (staff.status == "Busy") customPurple else customGreen
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = statusColor.copy(alpha = 0.2f), shape = RoundedCornerShape(15.dp))
+            .background(color = statusColor, shape = RoundedCornerShape(15.dp))
             .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -93,7 +94,7 @@ fun StaffffItem(staff: Staff) {
             Text(
                 text = staff.status,
                 fontStyle = FontStyle.Italic,
-                color = statusColor
+                color = Color.Green
             )
         } else {
             staff.task?.let {

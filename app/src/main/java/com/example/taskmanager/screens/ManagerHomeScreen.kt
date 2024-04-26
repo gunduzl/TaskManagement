@@ -1,6 +1,8 @@
 package com.example.taskmanager.screens
 
-
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -36,6 +38,8 @@ import androidx.compose.material3.TextFieldDefaults
 import com.example.taskmanager.components.pool.Pool
 
 
+
+
 @Composable
 fun ManagerHomeScreen(){
 
@@ -45,6 +49,8 @@ fun ManagerHomeScreen(){
     var taskDueDate by remember { mutableStateOf("") }
     var taskDifficulty by remember { mutableStateOf("") }
     var dropdownExpanded by remember { mutableStateOf(false) }
+
+
 
 
 
@@ -111,12 +117,15 @@ fun ManagerHomeScreen(){
 
                         )
 
+
                         TextField(
                             value = taskDueDate,
                             onValueChange = { taskDueDate = it },
                             label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+
                         )
+
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top=20.dp)
