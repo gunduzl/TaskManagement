@@ -5,5 +5,6 @@ enum class Screens {
     ProfileScreen,
     Leaderboard,
     SystemAdministratorScreen,
+
     //ManagerHomeScreen
 }
