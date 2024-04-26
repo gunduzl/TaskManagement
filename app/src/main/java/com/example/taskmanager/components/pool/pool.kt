@@ -146,12 +146,12 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun Pool(name: String, rowcolor: Color){
+fun Pool(name: String, rowcolor: Color, text:String){
     MaterialTheme {
         Column(
             modifier = Modifier
                 .size(width = 800.dp, height = 280.dp)
-                .padding(top = 30.dp, start = 20.dp, end = 10.dp)
+                .padding(top = 10.dp, start = 20.dp, end = 10.dp)
             ,
             horizontalAlignment = Alignment.Start,
         ) {
@@ -164,7 +164,7 @@ fun Pool(name: String, rowcolor: Color){
                 //.size(width = 800.dp, height = 250.dp)
             ) {
                 items(10) { index ->
-                    Task(name = "Develop an admin panel",
+                    Task(name = text,
                         description = "Develop an admin panel by using Jetpack Compose via Android Studio",
                         expectedFinishDate = "5 May 2024",
                         timeLeft = "8 days",
@@ -206,19 +206,6 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
             contentAlignment = Alignment.BottomEnd
         ) {
-            /*
-            if(openornot == "Open"){
-                Button(
-                    onClick = { /* Handle button click */ },
-
-                    ) {
-                    Icon(imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(50.dp)  )
-                }
-
-            }
-            */
 
 
         }

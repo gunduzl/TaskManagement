@@ -92,7 +92,7 @@ fun CreateEmployee(){
     var dropdownExpanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -243,7 +243,7 @@ fun RemoveEmployee(){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -319,7 +319,7 @@ fun ChangeEmployeeRole(){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -399,7 +399,7 @@ fun AddDepartment(){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -474,7 +474,7 @@ fun DeleteDepartment(){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .background(Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
+            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
