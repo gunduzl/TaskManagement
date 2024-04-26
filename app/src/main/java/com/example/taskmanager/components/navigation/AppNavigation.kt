@@ -17,10 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.screens.CTOProfile
-import com.example.taskmanager.screens.HomeScreen
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
-import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
 // Keep both imports if you need them both
