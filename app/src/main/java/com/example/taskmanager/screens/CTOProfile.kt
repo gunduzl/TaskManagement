@@ -34,7 +34,7 @@ import com.example.taskmanager.profileComponents.MyTeam_C
 enum class Team {
     TEAM_A,
     TEAM_B,
-    TEAM_C
+    TEAM_C,
 }
 
 @Composable
