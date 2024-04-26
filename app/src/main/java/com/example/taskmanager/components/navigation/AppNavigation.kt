@@ -16,12 +16,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.taskmanager.screens.CTOHomePage
 import com.example.taskmanager.screens.CTOProfile
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
-// Keep both imports if you need them both
+
 
 @Composable
 fun AppNavigation(navControl: NavController){
@@ -69,7 +70,8 @@ fun AppNavigation(navControl: NavController){
             }
             composable(route = Screens.HomeScreen.name){
                 //HomeScreen()
-                ManagerHomeScreen()
+                //ManagerHomeScreen()
+                CTOHomePage()
             }
             composable(route = Screens.ProfileScreen.name){
                 //ManagerProfile()
