@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.ui.theme.customGreen
+import com.example.taskmanager.ui.theme.customPurple
 
 @Composable
 fun MyTeam_A() {
@@ -46,13 +48,13 @@ fun MyTeam_A() {
                     .weight(1f) // Occupy half of the available vertical space
             ) {
                 val staffList = listOf(
-                    Staff("Gunduz", "Available", null, Color.Green),
-                    Staff("Ali", "Busy", "Task A", Color.Red),
-                    Staff("Alper", "Available", null, Color.Green),
-                    Staff("Elif", "Busy", "Task C", Color.Red),
-                    Staff("Ayşegül", "Busy", "Task A", Color.Red),
-                    Staff("Sadık", "Available", null, Color.Green),
-                    Staff("Eren", "Busy", "Task B", Color.Red)
+                    Staff("Gunduz", "Available", null, customGreen),
+                    Staff("Ali", "Busy", "Task A", customPurple),
+                    Staff("Alper", "Available", null, customGreen),
+                    Staff("Elif", "Busy", "Task C", customPurple),
+                    Staff("Ayşegül", "Busy", "Task A", customPurple),
+                    Staff("Sadık", "Available", null, customGreen),
+                    Staff("Eren", "Busy", "Task B", customPurple)
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -72,10 +74,12 @@ data class Staff(val name: String, val status: String, val task: String?, var st
 
 @Composable
 fun StaffItem(staff: Staff) {
+    val statusColor = if (staff.status == "Busy") customPurple else customGreen
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = staff.statusColor.copy(alpha = 0.2f), shape = RoundedCornerShape(15.dp))
+            .background(color = staff.statusColor, shape = RoundedCornerShape(15.dp))
             .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
