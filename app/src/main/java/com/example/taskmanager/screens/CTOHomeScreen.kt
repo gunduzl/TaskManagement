@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
@@ -48,14 +49,14 @@ fun CTOHomePage(){
     var showAddDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
-    var taskDueDate by remember { mutableStateOf(TextFieldValue()) }
+    var taskDueDate by remember { mutableStateOf("") }
     var taskDifficulty by remember { mutableStateOf("") }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Department.DEPARTMENT_1,) }
 
 
     Row(horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(start=10.dp, end=10.dp,top=10.dp)) {
+        modifier = Modifier.fillMaxWidth().padding(start=20.dp, end=20.dp,top=10.dp)) {
 
         Button(onClick = { /*TODO*/ }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
@@ -72,37 +73,40 @@ fun CTOHomePage(){
             title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
             text = {
                 Column (
-                    modifier = Modifier.background(Color.LightGray)
-                ){
+                    modifier = Modifier
+                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+
+                    //.border(BorderStroke(width = 4.dp, color = Color.Black))
 
 
+                ) {
                     TextField(
                         value = taskName,
                         onValueChange = { taskName = it },
                         label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
+
                     TextField(
                         value = taskDescription,
                         onValueChange = { taskDescription = it },
                         label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold) },
-                        modifier = Modifier.height(100.dp),
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
+                        modifier = Modifier.height(100.dp)
+
                     )
 
                     TextField(
                         value = taskDueDate,
                         onValueChange = { taskDueDate = it },
-                        label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) } ,
+                        label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-
                     )
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top=20.dp)
                             .clickable { dropdownExpanded = true }) {
                         Text(
-
                             text = "Select Difficulty:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
@@ -136,22 +140,29 @@ fun CTOHomePage(){
             },
             confirmButton = {
                 Button(
-                    onClick = { showAddDialog = false
+                    onClick = {
+                        showAddDialog = false
                         taskName = ""
                         taskDescription = ""
-                        taskDueDate = TextFieldValue("")
-                        taskDifficulty = ""},
+                        taskDueDate = ""
+                        taskDifficulty = ""
+                        dropdownExpanded = false
+                    },
                 ) {
                     Text("Add")
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = { showAddDialog = false
+                    onClick = {
+                        showAddDialog = false
                         taskName = ""
                         taskDescription = ""
-                        taskDueDate = TextFieldValue("")
-                        taskDifficulty = ""},
+                        taskDueDate = ""
+                        taskDifficulty = ""
+                        dropdownExpanded = false
+
+                    },
                 ) {
                     Text("Cancel")
                 }
@@ -161,7 +172,7 @@ fun CTOHomePage(){
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(start = 10.dp, end = 10.dp)) {
+        .padding(start = 10.dp, end = 10.dp, top =65.dp)) {
         // Navigation bar
         TeamNavigationBar(selectedTeam, setSelectedTeam)
         // Display team details based on the selected team
@@ -177,23 +188,23 @@ fun CTOHomePage(){
 @Composable
 fun Department_3() {
 
-    Pool("Open", Color(0xFFF0F8FF))
-    Pool("Active", Color(0xFFFFADB0))
+    Pool("Open", Color(0x666650a4), "Implement the profile page")
+    Pool("Active",  Color(0x666790a4),"Create a leaderboard interface")
 
 }
 
 @Composable
 fun Department_2() {
 
-    Pool("Open", Color(0xFFF0F8FF))
-    Pool("Active", Color(0xFFFFADB0))
+    Pool("Open", Color(0x666650a4),"Prepare presentation to customers")
+    Pool("Active",Color(0x666790a4),"Create a product development plan")
 }
 
 @Composable
 fun Department_1() {
 
-    Pool("Open", Color(0xFFF0F8FF))
-    Pool("Active", Color(0xFFFFADB0))
+    Pool("Open", Color(0x666650a4), "Develop and admin panel")
+    Pool("Active", Color(0x666790a4), "Modify the database")
 }
 
 

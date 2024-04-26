@@ -1,10 +1,8 @@
 package com.example.taskmanager.screens
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,25 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-
-
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material3.TextFieldDefaults
-
-
 import com.example.taskmanager.components.pool.Pool
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Brush
-import com.example.taskmanager.ui.theme.Purple40
 
 
 @Composable
@@ -67,11 +51,10 @@ fun ManagerHomeScreen(){
     Column(
         modifier = Modifier
             .fillMaxWidth(1f)
-            .fillMaxHeight(0.9f)
             .padding(top = 10.dp, start = 20.dp, end = 10.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(190.dp)
+            horizontalArrangement = Arrangement.spacedBy(180.dp)
         ){
             Button(onClick = { /*TODO*/ }) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
@@ -83,7 +66,7 @@ fun ManagerHomeScreen(){
         }
 
         Row(
-            modifier = Modifier.padding(top=10.dp)
+            modifier = Modifier.padding(top=20.dp)
         ) {
             Text(text = "My Department",
                 fontSize = 30.sp,
@@ -96,8 +79,8 @@ fun ManagerHomeScreen(){
             }
         }
 
-        Pool("Open", Color(0x666650a4)) //0xFFF0F8FF
-        Pool("Active", Color(0x666790a4)) //0xFFFFADB0
+        Pool("Open", Color(0x666650a4),"Develop and admin panel") //0xFFF0F8FF
+        Pool("Active", Color(0x666790a4),"Develop and admin panel") //0xFFFFADB0
 
         if (showAddDialog ) {
             AlertDialog(

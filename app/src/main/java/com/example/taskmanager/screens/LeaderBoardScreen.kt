@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,6 +35,7 @@ fun LeaderBoardScreen() {
             .fillMaxWidth(1f)
             .fillMaxHeight(0.9f)
             .padding(top = 10.dp, start = 20.dp, end = 10.dp)
+
     ) {
         Button(onClick = {  }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
