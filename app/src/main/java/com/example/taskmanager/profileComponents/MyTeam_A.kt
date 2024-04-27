@@ -1,5 +1,6 @@
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,11 +81,14 @@ data class Staff(val name: String, val status: String, val task: String?, var st
 fun StaffItem(staff: Staff) {
     val statusColor = if (staff.status == "Busy") customPurple else customGreen
 
+    val showDialog = remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = staff.statusColor, shape = RoundedCornerShape(15.dp))
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable { showDialog.value = true },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -90,11 +98,11 @@ fun StaffItem(staff: Staff) {
             fontSize = 20.sp
         )
         if (staff.status == "Available") {
-            staff.statusColor = Color.Green
+            staff.statusColor = customGreen
             Text(
                 text = staff.status,
                 fontStyle = FontStyle.Italic,
-                color = staff.statusColor
+                color = Color.Green
             )
         } else {
             staff.task?.let {
@@ -105,5 +113,24 @@ fun StaffItem(staff: Staff) {
                 )
             }
         }
+    }
+
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("Staff Details", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(text = "Name: ${staff.name}")
+                    Text(text = "Status: ${staff.status}")
+                    staff.task?.let { Text(text = "Task: $it") }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showDialog.value = false }) {
+                    Text("Close")
+                }
+            }
+        )
     }
 }

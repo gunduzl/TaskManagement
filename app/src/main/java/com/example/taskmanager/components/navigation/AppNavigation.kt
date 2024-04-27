@@ -16,77 +16,92 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.taskmanager.screens.CTOHomePage
+import com.example.taskmanager.screens.CTOHomeScreen
 import com.example.taskmanager.screens.CTOProfile
+import com.example.taskmanager.screens.HomeScreen
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
+import com.example.taskmanager.screens.ManagerProfile
+import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
 
 
 @Composable
-fun AppNavigation(navControl: NavController){
+fun AppNavigation(navControl: NavController, userRole: String) {
     val navController = rememberNavController()
-    
-    Scaffold(
-         bottomBar = {
-             NavigationBar {
-                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                 val currentDestination = navBackStackEntry?.destination
 
-                 listOfNavItems.forEach{navItem ->
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+
+                listOfNavItems.forEach { navItem ->
+                    // Conditionally show navigation items based on user role
+                    if (shouldShowNavItem(navItem.route, userRole)) {
                         NavigationBarItem(
-                            selected = currentDestination?.hierarchy?.any { it.route == navItem.route} == true,
+                            selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
                             onClick = {
-                                     navController.navigate(navItem.route){
-                                         popUpTo(navController.graph.findStartDestination().id){
-                                             saveState = true
-                                         }
-                                         launchSingleTop = true
-                                         restoreState = true
-                                     }
+                                navController.navigate(navItem.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             },
-                            icon = { Icon(
-                                imageVector = navItem.icon,
-                                contentDescription = null
-                            ) },
+                            icon = {
+                                Icon(
+                                    imageVector = navItem.icon,
+                                    contentDescription = null
+                                )
+                            },
                             label = {
                                 Text(text = navItem.label)
-                            } )
-                 }
+                            })
+                    }
+                }
 
-             }
+            }
         }
-    ) {paddingValues ->
+    ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = Screens.HomeScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
-        ){
-
-            composable(route = Screens.Leaderboard.name){
+        ) {
+            composable(route = Screens.Leaderboard.name) {
                 LeaderBoardScreen()
             }
-            composable(route = Screens.HomeScreen.name){
-                //HomeScreen()
-                //ManagerHomeScreen()
-                CTOHomePage()
+            composable(route = Screens.HomeScreen.name) {
+                when (userRole) {
+                    "staff" -> HomeScreen()
+                    "manager" -> ManagerHomeScreen()
+                    "cto" -> CTOHomeScreen()
+                    "admin" -> SystemAdministratorScreen()
+                }
             }
-            composable(route = Screens.ProfileScreen.name){
-                //ManagerProfile()
-                //ProfileScreen()
-                CTOProfile()
+            composable(route = Screens.ProfileScreen.name) {
+                when (userRole) {
+                    "staff" -> ProfileScreen()
+                    "manager" -> ManagerProfile()
+                    "cto" -> CTOProfile()
+                    "admin" -> SystemAdministratorScreen()
+                }
             }
-            composable(route = Screens.SystemAdministratorScreen.name){
-                SystemAdministratorScreen()
-            }
-            /*
-            composable(route = Screens.ManagerHomeScreen.name){
-                ManagerHomeScreen()
-            }*/
-
         }
-        
     }
+}
+
+private fun shouldShowNavItem(route: String, userRole: String): Boolean {
+    // Define navigation items to show for each user role
+    val navItemsToShow = mapOf(
+        "staff" to listOf( Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
+        "manager" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name ),
+        "cto" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
+        "admin" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.SystemAdministratorScreen.name)
+    )
+    return navItemsToShow[userRole]?.contains(route) ?: false
 }

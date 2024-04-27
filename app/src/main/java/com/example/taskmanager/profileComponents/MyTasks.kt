@@ -1,6 +1,7 @@
 package com.example.taskmanager.profileComponents
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,10 +18,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +33,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.ui.theme.customGreen
+import com.example.taskmanager.ui.theme.customPurple
 
 @Composable
 fun MyTasks() {
@@ -74,8 +81,8 @@ data class Task(val name: String, val status: String, val staffName: String?)
 @Composable
 fun TaskItem(task: Task) {
     val statusColor = when (task.status) {
-        "Done" -> Color.Green
-        "Processing" -> Color.Blue
+        "Done" -> customGreen
+        "Processing" -> customPurple
         else -> Color.Gray
     }
 
@@ -85,11 +92,14 @@ fun TaskItem(task: Task) {
         else -> null
     }
 
+    val showDialog = remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = statusColor.copy(alpha = 0.2f), shape = RoundedCornerShape(15.dp))
-            .padding(10.dp),
+            .background(color = statusColor, shape = RoundedCornerShape(15.dp))
+            .padding(10.dp)
+            .clickable { showDialog.value = true }, // Show dialog when clicked
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -98,20 +108,21 @@ fun TaskItem(task: Task) {
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = "Icon",
+                tint = if (task.status == "Done") Color.Green else Color.Blue,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+        }
         if (task.status == "Done") {
             Text(
                 text = task.status,
                 fontStyle = FontStyle.Italic,
-                color = statusColor,
+                color = Color.Green,
                 modifier = Modifier.padding(end = 8.dp)
             )
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = "Done",
-                    tint = statusColor
-                )
-            }
         } else {
             if (task.staffName != null) {
                 Text(
@@ -119,14 +130,27 @@ fun TaskItem(task: Task) {
                     fontSize = 14.sp,
                     modifier = Modifier.padding(start = 10.dp, end = 8.dp)
                 )
-                icon?.let {
-                    Icon(
-                        imageVector = it,
-                        contentDescription = "Processing",
-                        tint = statusColor
-                    )
-                }
             }
         }
+    }
+
+    // Alert Dialog
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("Task Details", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(text = "Task Name: ${task.name}")
+                    Text(text = "Status: ${task.status}")
+                    task.staffName?.let { Text(text = "Assigned to: $it") }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showDialog.value = false }) {
+                    Text("Close")
+                }
+            }
+        )
     }
 }
