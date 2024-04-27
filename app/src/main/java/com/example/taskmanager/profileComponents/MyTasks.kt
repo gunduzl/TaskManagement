@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -88,7 +89,7 @@ fun TaskItem(task: Task) {
 
     val icon = when (task.status) {
         "Done" -> Icons.Default.Check
-        "Processing" -> Icons.Default.Refresh
+        "Processing" -> Icons.Default.Info
         else -> null
     }
 
@@ -148,7 +149,14 @@ fun TaskItem(task: Task) {
             },
             confirmButton = {
                 Button(onClick = { showDialog.value = false }) {
-                    Text("Close")
+                    Text("Ask Help")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog.value = false },
+                ) {
+                    Text("Cancel")
                 }
             }
         )
