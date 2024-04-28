@@ -24,8 +24,8 @@ fun HomeScreen(){
         Button(onClick = { }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
         }
-        Pool("Open", Color(0x666650a4), "Develop and admin panel")
-        Pool("Active", Color(0x666790a4), "Develop and admin panel")
+        Pool("Open", Color(0x666650a4), "Develop and admin panel",true)
+        Pool("Active", Color(0x666790a4), "Develop and admin panel",true)
     }
 
 }
