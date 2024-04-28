@@ -187,23 +187,23 @@ fun CTOHomeScreen(){
 @Composable
 fun Department_3() {
 
-    Pool("Open", Color(0x666650a4), "Implement the profile page")
-    Pool("Active",  Color(0x666790a4),"Create a leaderboard interface")
+    Pool("Open", Color(0x666650a4), "Implement the profile page",false)
+    Pool("Active",  Color(0x666790a4),"Create a leaderboard interface",false)
 
 }
 
 @Composable
 fun Department_2() {
 
-    Pool("Open", Color(0x666650a4),"Prepare presentation to customers")
-    Pool("Active",Color(0x666790a4),"Create a product development plan")
+    Pool("Open", Color(0x666650a4),"Prepare presentation to customers",false)
+    Pool("Active",Color(0x666790a4),"Product development plan",false)
 }
 
 @Composable
 fun Department_1() {
 
-    Pool("Open", Color(0x666650a4), "Develop and admin panel")
-    Pool("Active", Color(0x666790a4), "Modify the database")
+    Pool("Open", Color(0x666650a4), "Develop and admin panel",false)
+    Pool("Active", Color(0x666790a4), "Modify the database",false)
 }
 
 

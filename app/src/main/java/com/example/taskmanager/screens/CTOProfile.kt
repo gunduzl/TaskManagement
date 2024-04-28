@@ -46,6 +46,14 @@ fun CTOProfile() {
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Team.TEAM_A) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
 
+    Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
+        Button(onClick = {
+        }
+        ) {
+            Text("Logout")
+        }
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(start = 20.dp, end = 20.dp)) {

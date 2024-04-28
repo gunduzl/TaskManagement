@@ -63,10 +63,13 @@ fun ManagerHomeScreen(){
             Button(onClick = { setShowNotification(true)}) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
             }
+            /*
             Button(onClick = {
             }) {
                 Text("Logout")
             }
+            */
+
         }
 
         Row(
@@ -83,8 +86,8 @@ fun ManagerHomeScreen(){
             }
         }
 
-        Pool("Open", Color(0x666650a4),"Develop and admin panel") //0xFFF0F8FF
-        Pool("Active", Color(0x666790a4),"Develop and admin panel") //0xFFFFADB0
+        Pool("Open", Color(0x666650a4),"Develop and admin panel",false) //0xFFF0F8FF
+        Pool("Active", Color(0x666790a4),"Develop and admin panel",false) //0xFFFFADB0
 
         if (showAddDialog ) {
             AlertDialog(

@@ -1,6 +1,7 @@
 package com.example.taskmanager.screens
 
 import MyTeam_A
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,8 +49,15 @@ fun ManagerProfile() {
     ) {
         LazyColumn {
             item {
-                Button(onClick = { setShowNotification(true)}) {
-                    Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                Row(horizontalArrangement = Arrangement.spacedBy(187.dp)) {
+                    Button(onClick = { setShowNotification(true)}) {
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                    }
+                    Button(onClick = {
+                        // Add your logout logic here
+                    }) {
+                        Text("Logout")
+                    }
                 }
             }
 

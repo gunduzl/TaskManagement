@@ -16,8 +16,8 @@ import com.example.taskmanager.components.pool.Pool
 
 @Composable
 fun HomeScreen() {
-
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth(1f)
@@ -29,8 +29,8 @@ fun HomeScreen() {
         }
 
         // Pools
-        Pool("Open", Color(0x666650a4), "Develop and admin panel")
-        Pool("Active", Color(0x666790a4), "Develop and admin panel")
+        Pool("Open", Color(0x666650a4), "Develop and admin panel", true)
+        Pool("Active", Color(0x666790a4), "Develop and admin panel", true)
     }
 
     // Display the NotificationScreen when showNotification is true
