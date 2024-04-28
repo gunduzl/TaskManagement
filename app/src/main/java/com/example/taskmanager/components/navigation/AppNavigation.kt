@@ -26,7 +26,6 @@ import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
 
-
 @Composable
 fun AppNavigation(navControl: NavController, userRole: String) {
     val navController = rememberNavController()
@@ -80,7 +79,7 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                     "staff" -> HomeScreen()
                     "manager" -> ManagerHomeScreen()
                     "cto" -> CTOHomeScreen()
-                    "admin" -> SystemAdministratorScreen()
+                    "admin" -> HomeScreen()
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
@@ -101,7 +100,7 @@ private fun shouldShowNavItem(route: String, userRole: String): Boolean {
         "staff" to listOf( Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
         "manager" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name ),
         "cto" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
-        "admin" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.SystemAdministratorScreen.name)
+        "admin" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name)
     )
     return navItemsToShow[userRole]?.contains(route) ?: false
 }
