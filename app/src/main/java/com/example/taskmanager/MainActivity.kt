@@ -22,7 +22,9 @@ class MainActivity : ComponentActivity() {
                         // Navigate to the AppNavigation screen and pass the user role
                         navController.navigate("/app-navigation/$userRole")
                     }
+
                 }
+
                 composable(route = "/app-navigation/{userRole}") { backStackEntry ->
                     // Extract user role from the route arguments
                     val userRole = backStackEntry.arguments?.getString("userRole") ?: ""

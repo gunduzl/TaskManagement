@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,6 +43,14 @@ enum class Team {
 @Composable
 fun CTOProfile() {
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Team.TEAM_A) }
+
+    Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
+        Button(onClick = {
+        }
+        ) {
+            Text("Logout")
+        }
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
