@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.profileComponents.MyTasks
 
 
@@ -43,9 +48,17 @@ fun ProfileScreen() {
     ) {
         LazyColumn {
             item {
-                Button(onClick = { }) {
-                    Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                Row(horizontalArrangement = Arrangement.spacedBy(187.dp)) {
+                    Button(onClick = { }) {
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                    }
+                    Button(onClick = {
+                    }
+                    ) {
+                        Text("Logout")
+                    }
                 }
+
             }
 
             item {
@@ -129,6 +142,8 @@ fun ProfileScreen() {
         ) {
             MyTasks()
         }
+
+
     }
 }
 
@@ -142,3 +157,4 @@ fun ProfileIconn(icon: ImageVector) {
             .clip(CircleShape)
     )
 }
+
