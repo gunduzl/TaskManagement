@@ -46,6 +46,7 @@ fun ManagerHomeScreen(){
     var taskDueDate by remember { mutableStateOf("") }
     var taskDifficulty by remember { mutableStateOf("") }
     var dropdownExpanded by remember { mutableStateOf(false) }
+    val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
 
 
 
@@ -59,7 +60,7 @@ fun ManagerHomeScreen(){
         Row(
             horizontalArrangement = Arrangement.spacedBy(180.dp)
         ){
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { setShowNotification(true)}) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
             }
             Button(onClick = {
@@ -190,6 +191,9 @@ fun ManagerHomeScreen(){
                 }
             )
         }
+    }
+    if (showNotification) {
+        NotificationScreen(onClose = { setShowNotification(false) })
     }
 
 }

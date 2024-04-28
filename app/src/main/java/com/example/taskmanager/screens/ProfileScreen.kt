@@ -24,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +36,9 @@ import com.example.taskmanager.profileComponents.MyTasks
 
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen()
+
+    { val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,7 +47,7 @@ fun ProfileScreen() {
     ) {
         LazyColumn {
             item {
-                Button(onClick = { }) {
+                Button(onClick = {setShowNotification(true) }) {
                     Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                 }
             }
@@ -130,6 +134,11 @@ fun ProfileScreen() {
             MyTasks()
         }
     }
+
+        // Display the NotificationScreen when showNotification is true
+        if (showNotification) {
+            NotificationScreen(onClose = { setShowNotification(false) })
+        }
 }
 
 @Composable
