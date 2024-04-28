@@ -146,7 +146,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun Pool(name: String, rowcolor: Color, text:String){
+fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -164,13 +164,40 @@ fun Pool(name: String, rowcolor: Color, text:String){
                 //.size(width = 800.dp, height = 250.dp)
             ) {
                 items(10) { index ->
-                    Task(name = text,
-                        description = "Develop an admin panel by using Jetpack Compose via Android Studio",
-                        expectedFinishDate = "5 May 2024",
-                        timeLeft = "8 days",
-                        difficulty = "Hard",
-                        col = rowcolor,
-                        openornot = name )
+
+                    if((name == "Active") && (isStaff == false) ){
+                        if(index < 3){
+                            Task(name = text,
+                                description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                                expectedFinishDate = "5 May 2024",
+                                timeLeft = "8 days",
+                                difficulty = "Hard",
+                                col = rowcolor,
+                                openornot = name ,
+                                isHelp = true)
+                        }
+                        else{
+                            Task(name = text,
+                                description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                                expectedFinishDate = "5 May 2024",
+                                timeLeft = "8 days",
+                                difficulty = "Hard",
+                                col = rowcolor,
+                                openornot = name ,
+                                isHelp = false)
+                        }
+                    }
+                    else{
+                        Task(name = text,
+                            description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                            expectedFinishDate = "5 May 2024",
+                            timeLeft = "8 days",
+                            difficulty = "Hard",
+                            col = rowcolor,
+                            openornot = name ,
+                            isHelp = false)
+                    }
+
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
@@ -181,7 +208,7 @@ fun Pool(name: String, rowcolor: Color, text:String){
 }
 
 @Composable
-fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String){
+fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String, isHelp: Boolean){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -197,19 +224,49 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
     ){
 
-        Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+        if (isHelp == true){
+            Column{
+                Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+                Row {
+                    Button(
+                        onClick = { },
+                    ) {
+                        Text("Confirm")
+                    }
+                    Button(
+                        onClick = { },
+                    ) {
+                        Text("Reject")
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
 
-            contentAlignment = Alignment.BottomEnd
-        ) {
+
+            }
+        }
+        else{
+            Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
+
+                contentAlignment = Alignment.BottomEnd
+            ) {
+
+
+            }
 
 
         }
-
 
 
     }
