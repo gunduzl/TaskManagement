@@ -1,6 +1,5 @@
 package com.example.taskmanager.components.pool
 
-import android.view.View.ALPHA
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.taskmanager.ui.theme.customGreen
 
 
 @Composable
@@ -252,7 +251,7 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
             },
             confirmButton = {
-                ALPHA
+                customGreen
             },
             dismissButton = {
                 Button(
