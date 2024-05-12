@@ -63,12 +63,6 @@ fun ManagerHomeScreen(){
             Button(onClick = { setShowNotification(true)}) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
             }
-            /*
-            Button(onClick = {
-            }) {
-                Text("Logout")
-            }
-            */
 
         }
 
