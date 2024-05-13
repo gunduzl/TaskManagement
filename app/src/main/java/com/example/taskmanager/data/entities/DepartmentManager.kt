@@ -11,6 +11,7 @@ data class DepartmentManager(
     val email: String,
     val password: String,
     val role: String,
+    val managerPoint: Int,
     val departmentId: Int,  // Ensure this connects to a specific department
     val CTOId: Int          // Connect to CTO if needed
 )
