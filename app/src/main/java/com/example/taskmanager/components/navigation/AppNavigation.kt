@@ -79,7 +79,7 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                     "staff" -> HomeScreen()
                     "manager" -> ManagerHomeScreen()
                     "cto" -> CTOHomeScreen()
-                    "admin" -> HomeScreen()
+                    "admin" -> CTOHomeScreen()
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
