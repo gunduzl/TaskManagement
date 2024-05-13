@@ -9,8 +9,10 @@ data class Task(
     val title: String,
     val description: String,
     val status: String,
+    val isFinished: Boolean,
     val priority: String,
     val deadline: String,
+    val taskPoint: Int,
     val departmentId: Int  // assuming tasks are related to departments
 )
 
