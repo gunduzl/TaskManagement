@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.taskmanager.components.navigation.AppNavigation
+import com.example.taskmanager.presentation.components.navigation.AppNavigation
 
 
 class MainActivity : ComponentActivity() {
