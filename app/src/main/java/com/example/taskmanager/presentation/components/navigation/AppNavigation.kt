@@ -36,6 +36,9 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
+
+
+
                 listOfNavItems.forEach { navItem ->
                     // Conditionally show navigation items based on user role
                     if (shouldShowNavItem(navItem.route, userRole)) {
@@ -79,7 +82,7 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                     "staff" -> HomeScreen()
                     "manager" -> ManagerHomeScreen()
                     "cto" -> CTOHomeScreen()
-                    "admin" -> HomeScreen()
+                    "admin" -> CTOHomeScreen()
                 }
             }
             composable(route = Screens.ProfileScreen.name) {

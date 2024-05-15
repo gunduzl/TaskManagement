@@ -73,7 +73,8 @@ fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
                                 difficulty = "Hard",
                                 col = rowcolor,
                                 openornot = name ,
-                                isHelp = true)
+                                isHelp = true,
+                                isManager = !isStaff)
                         }
                         else{
                             Task(name = text,
@@ -83,7 +84,8 @@ fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
                                 difficulty = "Hard",
                                 col = rowcolor,
                                 openornot = name ,
-                                isHelp = false)
+                                isHelp = false,
+                                isManager = !isStaff)
                         }
                     }
                     else{
@@ -94,7 +96,8 @@ fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
                             difficulty = "Hard",
                             col = rowcolor,
                             openornot = name ,
-                            isHelp = false)
+                            isHelp = false,
+                            isManager = !isStaff)
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -108,7 +111,7 @@ fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
 
 
 @Composable
-fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String, isHelp: Boolean){
+fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String, isHelp: Boolean, isManager: Boolean){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -212,10 +215,13 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
                 },
             confirmButton = {
-                Button(
-                    onClick = { showDialog = false },
-                ) {
-                    Text("Take Task")
+                if(isManager == false) {
+                    Button(
+                        onClick = { showDialog = false },
+                    ) {
+                        Text("Take Task")
+                    }
+
                 }
             },
             dismissButton = {

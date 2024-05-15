@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -59,6 +60,10 @@ fun CTOHomeScreen(){
 
         Button(onClick = { setShowNotification(true) }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
+        }
+
+        Button(onClick = { showAddDialog = true  }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null )
         }
     }
 
