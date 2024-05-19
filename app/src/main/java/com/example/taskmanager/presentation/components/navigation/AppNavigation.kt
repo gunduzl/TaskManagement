@@ -1,13 +1,8 @@
 package com.example.taskmanager.presentation.components.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -16,18 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.taskmanager.presentation.screens.CTOHomeScreen
-import com.example.taskmanager.presentation.screens.CTOProfile
-import com.example.taskmanager.presentation.screens.HomeScreen
-import com.example.taskmanager.presentation.screens.LeaderBoardScreen
-import com.example.taskmanager.presentation.screens.ManagerHomeScreen
-import com.example.taskmanager.presentation.screens.ManagerProfile
-import com.example.taskmanager.presentation.screens.ProfileScreen
-import com.example.taskmanager.presentation.screens.SystemAdministratorScreen
-
+import com.example.taskmanager.presentation.screens.*
 
 @Composable
-fun AppNavigation(navControl: NavController, userRole: String) {
+fun AppNavigation(navControl: NavController, userRole: String, userId: Int) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -36,11 +23,7 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
-
-
-
                 listOfNavItems.forEach { navItem ->
-                    // Conditionally show navigation items based on user role
                     if (shouldShowNavItem(navItem.route, userRole)) {
                         NavigationBarItem(
                             selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -64,33 +47,31 @@ fun AppNavigation(navControl: NavController, userRole: String) {
                             })
                     }
                 }
-
             }
         }
     ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = Screens.HomeScreen.name,
-            modifier = Modifier
-                .padding(paddingValues)
+            modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Screens.Leaderboard.name) {
                 LeaderBoardScreen()
             }
             composable(route = Screens.HomeScreen.name) {
-                when (userRole) {
-                    "staff" -> HomeScreen()
-                    "manager" -> ManagerHomeScreen()
-                    "cto" -> CTOHomeScreen()
-                    "admin" -> CTOHomeScreen()
+                when (userRole.lowercase()) {
+                    "staff" -> HomeScreen(userId)
+                    "manager" -> ManagerHomeScreen(userId)
+                    "cto" -> CTOHomeScreen(userId)
+                    "admin" -> CTOHomeScreen(userId)
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
-                when (userRole) {
-                    "staff" -> ProfileScreen()
-                    "manager" -> ManagerProfile()
-                    "cto" -> CTOProfile()
-                    "admin" -> SystemAdministratorScreen()
+                when (userRole.lowercase()) {
+                    "staff" -> ProfileScreen(userRole, userId)
+                    "manager" -> ManagerProfile(userId)
+                    "cto" -> CTOProfile(userId)
+                    "admin" -> SystemAdministratorScreen(userId)
                 }
             }
         }
@@ -98,10 +79,9 @@ fun AppNavigation(navControl: NavController, userRole: String) {
 }
 
 private fun shouldShowNavItem(route: String, userRole: String): Boolean {
-    // Define navigation items to show for each user role
     val navItemsToShow = mapOf(
-        "staff" to listOf( Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
-        "manager" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name ),
+        "staff" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
+        "manager" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
         "cto" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
         "admin" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name)
     )
