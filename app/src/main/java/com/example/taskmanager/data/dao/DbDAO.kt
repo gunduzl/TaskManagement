@@ -74,13 +74,17 @@ interface DbDAO {
     @Query("SELECT * FROM TaskStaffCrossRef WHERE staffId = :staffId") // Get all tasks assigned to a staff
     suspend fun getTaskFromStaff(staffId: Int): List<TaskWithStaff>
 
+    @Transaction
+    @Query("SELECT * FROM Task WHERE status = :status AND departmentId = :departmentId")
+    suspend fun getTasksByStatusAndDepartment(status: String, departmentId: Int): List<Task>
 
     @Transaction
     @Query("SELECT * FROM TaskStaffCrossRef WHERE taskId = :taskId") // Get all staff assigned to a task
     abstract fun getStaffFromTask(taskId: Int): List<TaskWithStaff>
 
 
-
+    @Query("SELECT * FROM Task WHERE status = :status")
+    suspend fun getTasksByStatus(status: String): List<Task>
 
     // Update methods if needed
     @Update

@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: Repository
-    private val _userRoleWithId = MutableLiveData<Pair<String, Int>>()
-    val userRoleWithId: LiveData<Pair<String, Int>> get() = _userRoleWithId
+    private val _userRoleWithIdAndDept = MutableLiveData<Triple<String, Int, Int?>>()
+    val userRoleWithIdAndDept: LiveData<Triple<String, Int, Int?>> get() = _userRoleWithIdAndDept
 
     init {
         val dbDAO = AppDatabase.getDatabase(application).dbDAO()
@@ -25,23 +25,23 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val staff = repository.authenticateStaff(email, password)
             if (staff != null) {
-                _userRoleWithId.postValue(Pair("Staff", staff.id))
+                _userRoleWithIdAndDept.postValue(Triple("Staff", staff.id, null))
                 return@launch
             }
 
             val manager = repository.authenticateManager(email, password)
             if (manager != null) {
-                _userRoleWithId.postValue(Pair("Manager", manager.id))
+                _userRoleWithIdAndDept.postValue(Triple("Manager", manager.id, manager.departmentId))
                 return@launch
             }
 
             val cto = repository.authenticateCTO(email, password)
             if (cto != null) {
-                _userRoleWithId.postValue(Pair("CTO", cto.id)) // return CTO role and id
+                _userRoleWithIdAndDept.postValue(Triple("CTO", cto.id, null))
                 return@launch
             }
 
-            _userRoleWithId.postValue(Pair("", 0)) // no user found
+            _userRoleWithIdAndDept.postValue(Triple("", 0, null)) // no user found
         }
     }
 }

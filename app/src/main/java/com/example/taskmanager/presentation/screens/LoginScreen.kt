@@ -1,26 +1,50 @@
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import android.app.Application
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taskmanager.presentation.viewmodel.factory.LoginViewModelFactory
 import com.example.taskmanager.presentation.viewmodel.pages.LoginViewModel
-import androidx.compose.runtime.livedata.observeAsState
+
 
 @Composable
-fun LoginScreen(onLoginSuccess: (userRole: String, userId: Int) -> Unit) {
-    val loginViewModel: LoginViewModel = viewModel()
+fun LoginScreen(onLoginSuccess: (userRole: String, userId: Int, departmentId: Int?) -> Unit) {
+    val context = LocalContext.current
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context.applicationContext as Application))
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    val userRoleWithId by loginViewModel.userRoleWithId.observeAsState(Pair("", 0))
+    val userRoleWithIdAndDept by loginViewModel.userRoleWithIdAndDept.observeAsState()
 
-    if (userRoleWithId.first.isNotEmpty()) {
-        onLoginSuccess(userRoleWithId.first, userRoleWithId.second)
+    LaunchedEffect(userRoleWithIdAndDept) {
+        userRoleWithIdAndDept?.let { (userRole, userId, departmentId) ->
+            if (userRole.isNotEmpty()) {
+                onLoginSuccess(userRole, userId, departmentId)
+            } else {
+                errorMessage = "User not found or invalid credentials"
+            }
+        }
     }
 
     Column(
@@ -48,17 +72,13 @@ fun LoginScreen(onLoginSuccess: (userRole: String, userId: Int) -> Unit) {
             value = password,
             onValueChange = { password = it },
             label = { Text(text = "Password") },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                loginViewModel.authenticateUser(email, password)
-            } else {
-                errorMessage = "Please enter both email and password"
-            }
+            loginViewModel.authenticateUser(email, password)
         }) {
             Text(text = "Login")
         }
@@ -75,7 +95,7 @@ fun LoginScreen(onLoginSuccess: (userRole: String, userId: Int) -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        TextButton(onClick = { /* Handle forgot password */ }) {
+        TextButton(onClick = { /* Add forgot password logic */ }) {
             Text(text = "Forgot Password?")
         }
     }
