@@ -54,6 +54,15 @@ interface DbDAO {
     @Query("SELECT * FROM Staff WHERE id = :staffId")
     suspend fun getStaffById(staffId: Int): Staff
 
+    @Query("SELECT * FROM Staff WHERE id = :managerId")
+    suspend fun getDepartmentManagerById(managerId: Int): DepartmentManager
+
+
+
+    @Query("SELECT * FROM Staff WHERE departmentManagerId = :managerId")
+    fun getStaffByManager(managerId: Int): List<Staff>
+
+
     // Task methods
     @Insert
     suspend fun insertTask(task: Task)
@@ -65,13 +74,17 @@ interface DbDAO {
     @Query("SELECT * FROM TaskStaffCrossRef WHERE staffId = :staffId") // Get all tasks assigned to a staff
     suspend fun getTaskFromStaff(staffId: Int): List<TaskWithStaff>
 
+    @Transaction
+    @Query("SELECT * FROM Task WHERE status = :status AND departmentId = :departmentId")
+    suspend fun getTasksByStatusAndDepartment(status: String, departmentId: Int): List<Task>
 
     @Transaction
     @Query("SELECT * FROM TaskStaffCrossRef WHERE taskId = :taskId") // Get all staff assigned to a task
     abstract fun getStaffFromTask(taskId: Int): List<TaskWithStaff>
 
 
-
+    @Query("SELECT * FROM Task WHERE status = :status")
+    suspend fun getTasksByStatus(status: String): List<Task>
 
     // Update methods if needed
     @Update
@@ -88,5 +101,16 @@ interface DbDAO {
 
     @Update
     suspend fun updateTask(task: Task)
+
+    // authentication
+    @Query("SELECT * FROM Staff WHERE email = :email AND password = :password")
+    suspend fun authenticateStaff(email: String, password: String): Staff?
+
+    @Query("SELECT * FROM DepartmentManager WHERE email = :email AND password = :password")
+    suspend fun authenticateManager(email: String, password: String): DepartmentManager?
+
+    @Query("SELECT * FROM CTO WHERE email = :email AND password = :password")
+    suspend fun authenticateCTO(email: String, password: String): CTO?
+
 
 }

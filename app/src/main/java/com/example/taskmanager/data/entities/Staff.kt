@@ -11,7 +11,9 @@ data class Staff(
     val email: String,
     val password: String,
     val staffPoint: Int,
+    val status: String,
     val role: String,
+    val taskId: Int,
     val departmentId: Int,
     val departmentManagerId: Int
 )
