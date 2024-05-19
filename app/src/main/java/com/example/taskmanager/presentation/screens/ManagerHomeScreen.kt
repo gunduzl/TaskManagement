@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,15 +33,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taskmanager.data.entities.Task
 import com.example.taskmanager.presentation.components.pool.Pool
-
-
-
+import com.example.taskmanager.presentation.viewmodel.pages.ManagerHomeViewModel
 
 @Composable
-fun ManagerHomeScreen(){
-
-
+fun ManagerHomeScreen(managerId: Int, departmentId: Int) {
+    val viewModel: ManagerHomeViewModel = viewModel()
+    val openTasks by viewModel.openTasks.collectAsState()
+    val activeTasks by viewModel.activeTasks.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
@@ -48,83 +51,66 @@ fun ManagerHomeScreen(){
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
 
-
-
-
+    LaunchedEffect(departmentId) {
+        viewModel.loadTasksForDepartment(departmentId)
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth(1f)
             .padding(top = 10.dp, start = 20.dp, end = 10.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(180.dp)
-        ){
-            Button(onClick = { setShowNotification(true)}) {
-                Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
+        Row(horizontalArrangement = Arrangement.spacedBy(180.dp)) {
+            Button(onClick = { setShowNotification(true) }) {
+                Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
             }
-
         }
 
-        Row(
-            modifier = Modifier.padding(top=20.dp)
-        ) {
-            Text(text = "My Department",
+        Row(modifier = Modifier.padding(top = 20.dp)) {
+            Text(
+                text = "My Department",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end= 20.dp, start= 40.dp)
+                modifier = Modifier.padding(end = 20.dp, start = 40.dp)
             )
-
-            Button(onClick = { showAddDialog = true  }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null )
+            Button(onClick = { showAddDialog = true }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }
 
-        Pool("Open", Color(0x666650a4),"Develop and admin panel",false) //0xFFF0F8FF
-        Pool("Active", Color(0x666790a4),"Develop and admin panel",false) //0xFFFFADB0
-
-        if (showAddDialog ) {
+        Pool("Open", Color(0x666650a4), isStaff = false)
+        Pool("Active", Color(0x666790a4), isStaff = false)
+        if (showAddDialog) {
             AlertDialog(
                 onDismissRequest = { showAddDialog = false },
                 title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
                 text = {
-                    Column (
-                        modifier = Modifier
-                            .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
-
-                            //.border(BorderStroke(width = 4.dp, color = Color.Black))
-
-
-                    ) {
+                    Column(modifier = Modifier.background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))) {
                         TextField(
                             value = taskName,
                             onValueChange = { taskName = it },
                             label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                         )
-
                         TextField(
                             value = taskDescription,
                             onValueChange = { taskDescription = it },
                             label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                             modifier = Modifier.height(100.dp)
-
                         )
-
-
                         TextField(
                             value = taskDueDate,
                             onValueChange = { taskDueDate = it },
                             label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-
                         )
-
-                        Row(verticalAlignment = Alignment.CenterVertically,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top=20.dp)
-                                .clickable { dropdownExpanded = true }) {
+                                .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                                .clickable { dropdownExpanded = true }
+                        ) {
                             Text(
                                 text = "Select Difficulty:",
                                 fontWeight = FontWeight.Bold,
@@ -132,41 +118,47 @@ fun ManagerHomeScreen(){
                                 modifier = Modifier.padding(end = 8.dp)
                             )
                             Text(
-                                text = taskDifficulty.takeIf { it.isNotBlank() } ?: "Select",
-
-                                )
+                                text = taskDifficulty.takeIf { it.isNotBlank() } ?: "Select"
+                            )
                         }
-                        DropdownMenu(expanded = dropdownExpanded,
-                            onDismissRequest = { /*TODO*/ },
-                            modifier = Modifier) {
-
-                            DropdownMenuItem(text = { Text("Easy")}, onClick = {
+                        DropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }) {
+                            DropdownMenuItem(text = { Text("Easy") }, onClick = {
                                 taskDifficulty = "Easy"
                                 dropdownExpanded = false
                             })
-                            DropdownMenuItem(text = { Text("Medium")}, onClick = {
+                            DropdownMenuItem(text = { Text("Medium") }, onClick = {
                                 taskDifficulty = "Medium"
                                 dropdownExpanded = false
                             })
-                            DropdownMenuItem(text = { Text("Hard")}, onClick = {
-                                taskDifficulty = "hard"
+                            DropdownMenuItem(text = { Text("Hard") }, onClick = {
+                                taskDifficulty = "Hard"
                                 dropdownExpanded = false
                             })
                         }
-
                     }
-
                 },
                 confirmButton = {
                     Button(
                         onClick = {
                             showAddDialog = false
+                            val task = Task(
+                                id = 0,
+                                title = taskName,
+                                description = taskDescription,
+                                status = "Open",
+                                isFinished = false,
+                                priority = taskDifficulty,
+                                deadline = taskDueDate,
+                                taskPoint = 0,
+                                departmentId = departmentId
+                            )
+                            viewModel.addTask(task)
                             taskName = ""
                             taskDescription = ""
                             taskDueDate = ""
                             taskDifficulty = ""
                             dropdownExpanded = false
-                                  },
+                        }
                     ) {
                         Text("Add")
                     }
@@ -180,8 +172,7 @@ fun ManagerHomeScreen(){
                             taskDueDate = ""
                             taskDifficulty = ""
                             dropdownExpanded = false
-
-                            },
+                        }
                     ) {
                         Text("Cancel")
                     }
@@ -192,5 +183,4 @@ fun ManagerHomeScreen(){
     if (showNotification) {
         NotificationScreen(onClose = { setShowNotification(false) })
     }
-
 }

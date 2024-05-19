@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -25,24 +24,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taskmanager.presentation.profileComponents.MyTasks
+import com.example.taskmanager.presentation.profileComponents.MyTeam
+import com.example.taskmanager.presentation.viewmodel.pages.ProfileViewModel
 
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(userRole: String, userId: Int) {
+    val profileViewModel: ProfileViewModel = viewModel()
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        profileViewModel.loadUserProfile(userRole, userId)
+    }
+
+    val userProfile by profileViewModel.userProfile.collectAsState()
 
     Column(
         modifier = Modifier
@@ -67,19 +74,19 @@ fun ProfileScreen() {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Profile Icon
-                    ProfileIconn(icon = Icons.Default.Person)
+                    ProfileIcon(icon = Icons.Default.Person)
 
                     Spacer(modifier = Modifier.width(25.dp))
 
-                    // Manager Details
+                    // User Details
                     Column {
                         Text(
-                            text = "Staff Name",
+                            text = userProfile.name,
                             style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Department Name",
+                            text = userProfile.departmentName,
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -91,16 +98,15 @@ fun ProfileScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth() // Fill the maximum width available
-                        .wrapContentHeight() // Wrap the height based on content
-                        .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding for spacing
-                        .offset(x = 65.dp, y = 30.dp) // Adjust the position on the screen
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .offset(x = 65.dp, y = 30.dp)
                 ) {
-                    // Manager Points
+                    // Points
                     Surface(
-                        modifier = Modifier
-                            .size(180.dp, 50.dp),
-                        color = MaterialTheme.colorScheme.primary, // Set your desired background color here
+                        modifier = Modifier.size(180.dp, 50.dp),
+                        color = MaterialTheme.colorScheme.primary,
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
@@ -108,21 +114,20 @@ fun ProfileScreen() {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Star, // Example icon, replace with appropriate icon
+                                imageVector = Icons.Default.Star,
                                 contentDescription = "Points Icon",
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = "Points:9",
+                                text = "Points: ${userProfile.points}",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = Color.White,
-                                modifier = Modifier
-                                    .offset(x = 8.dp , y = 0.dp) // Occupy maximum available width
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)
                             )
                             Spacer(modifier = Modifier.width(20.dp))
                             Icon(
-                                imageVector = Icons.Default.Star, // Example icon, replace with appropriate icon
+                                imageVector = Icons.Default.Star,
                                 contentDescription = "Points Icon",
                                 modifier = Modifier.size(24.dp)
                             )
@@ -131,7 +136,6 @@ fun ProfileScreen() {
                 }
             }
             item {
-                //
                 Spacer(modifier = Modifier.height(35.dp))
             }
         }
@@ -141,23 +145,15 @@ fun ProfileScreen() {
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            MyTasks()
+            if (userRole.lowercase() == "staff") {
+                MyTasks(userId, userRole)
+            } else if (userRole.lowercase() == "manager") {
+                MyTeam(userId)
+            }
         }
     }
 
-    // Display the NotificationScreen when showNotification is true
     if (showNotification) {
         NotificationScreen(onClose = { setShowNotification(false) })
     }
-}
-
-@Composable
-fun ProfileIconn(icon: ImageVector) {
-    Icon(
-        imageVector = icon,
-        contentDescription = "Profile Icon",
-        modifier = Modifier
-            .size(72.dp)
-            .clip(CircleShape)
-    )
 }

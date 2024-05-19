@@ -1,4 +1,4 @@
-
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,23 +9,43 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taskmanager.presentation.viewmodel.factory.LoginViewModelFactory
+import com.example.taskmanager.presentation.viewmodel.pages.LoginViewModel
+
 
 @Composable
-fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
+fun LoginScreen(onLoginSuccess: (userRole: String, userId: Int, departmentId: Int?) -> Unit) {
+    val context = LocalContext.current
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context.applicationContext as Application))
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val userRoleWithIdAndDept by loginViewModel.userRoleWithIdAndDept.observeAsState()
+
+    LaunchedEffect(userRoleWithIdAndDept) {
+        userRoleWithIdAndDept?.let { (userRole, userId, departmentId) ->
+            if (userRole.isNotEmpty()) {
+                onLoginSuccess(userRole, userId, departmentId)
+            } else {
+                errorMessage = "User not found or invalid credentials"
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -52,18 +72,13 @@ fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
             value = password,
             onValueChange = { password = it },
             label = { Text(text = "Password") },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            val userRole = authenticateUser(email, password)
-            if (userRole.isNotEmpty()) {
-                onLoginSuccess(userRole)
-            } else {
-                errorMessage = "User not found or invalid credentials"
-            }
+            loginViewModel.authenticateUser(email, password)
         }) {
             Text(text = "Login")
         }
@@ -80,31 +95,8 @@ fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        TextButton(onClick = { }) {
+        TextButton(onClick = { /* Add forgot password logic */ }) {
             Text(text = "Forgot Password?")
         }
     }
-}
-
-// Dummy authentication function, replace it with your actual authentication logic
-fun authenticateUser(email: String, password: String): String {
-    val dummyData = mapOf(
-        "staff@example.com" to "password",
-        "manager@example.com" to "password",
-        "cto@example.com" to "password",
-        "admin@example.com" to "password"
-    )
-    val userRole = when {
-        dummyData[email] == password -> {
-            when (email) {
-                "staff@example.com" -> "staff"
-                "manager@example.com" -> "manager"
-                "cto@example.com" -> "cto"
-                "admin@example.com" -> "admin"
-                else -> ""
-            }
-        }
-        else -> ""
-    }
-    return userRole
 }
