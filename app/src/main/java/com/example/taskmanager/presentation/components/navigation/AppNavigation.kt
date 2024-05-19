@@ -13,8 +13,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.presentation.screens.*
 
+
+
 @Composable
-fun AppNavigation(navControl: NavController, userRole: String, userId: Int) {
+fun AppNavigation(navControl: NavController, userRole: String, userId: Int, departmentId: Int? = null) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -61,17 +63,17 @@ fun AppNavigation(navControl: NavController, userRole: String, userId: Int) {
             composable(route = Screens.HomeScreen.name) {
                 when (userRole.lowercase()) {
                     "staff" -> HomeScreen(userId)
-                    "manager" -> ManagerHomeScreen(userId)
-                    "cto" -> CTOHomeScreen(userId)
-                    "admin" -> CTOHomeScreen(userId)
+                    "manager" -> ManagerHomeScreen(managerId = userId, departmentId = departmentId ?: 0)
+                    "cto" -> CTOHomeScreen()
+                    "admin" -> CTOHomeScreen()
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
                 when (userRole.lowercase()) {
                     "staff" -> ProfileScreen(userRole, userId)
-                    "manager" -> ManagerProfile(userId)
-                    "cto" -> CTOProfile(userId)
-                    "admin" -> SystemAdministratorScreen(userId)
+                    "manager" -> ManagerProfile()
+                    "cto" -> CTOProfile()
+                    "admin" -> SystemAdministratorScreen()
                 }
             }
         }

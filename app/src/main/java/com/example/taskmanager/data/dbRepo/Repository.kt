@@ -86,6 +86,14 @@ class Repository(private val dbDAO: DbDAO) {
         return dbDAO.getTaskFromStaff(staffID).filter { it.task.status == "Open" }
     }
 
+    suspend fun getTasksByStatus(status: String): List<Task> {
+        return dbDAO.getTasksByStatus(status)
+    }
+
+    suspend fun getTasksByStatusAndDepartment(status: String, departmentId: Int): List<Task> {
+        return dbDAO.getTasksByStatusAndDepartment(status, departmentId)
+    }
+
     suspend fun takeTask(staffID: Int, taskID: Int) {
         dbDAO.insertTaskStaffCrossRef(TaskStaffCrossRef(taskID, staffID))
     }
