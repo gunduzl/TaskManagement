@@ -15,12 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,18 +32,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.taskmanager.data.entities.Task
+import com.example.taskmanager.data.entities.Staff
 import com.example.taskmanager.presentation.ui.theme.customGreen
 import com.example.taskmanager.presentation.ui.theme.customPurple
-import com.example.taskmanager.presentation.viewmodel.MyTasksViewModel
+import com.example.taskmanager.presentation.viewmodel.MyTeamViewModel
 
 @Composable
-fun MyTasks(userId: Int, userRole: String) {
-    val viewModel: MyTasksViewModel = viewModel()
-    val tasks by viewModel.tasks.collectAsState()
+fun MyTeam(managerId: Int) {
+    val viewModel: MyTeamViewModel = viewModel()
+    val staffList by viewModel.staffList.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadTasksForUser(userId, userRole)
+    LaunchedEffect(managerId) {
+        viewModel.loadStaffForManager(managerId)
     }
 
     Column(
@@ -57,7 +53,7 @@ fun MyTasks(userId: Int, userRole: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "My Tasks",
+            text = "My Team",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 10.dp)
@@ -73,8 +69,8 @@ fun MyTasks(userId: Int, userRole: String) {
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(tasks) { task ->
-                    TaskItem(task)
+                items(staffList) { staff ->
+                    StaffItem(staff)
                 }
             }
         }
@@ -82,17 +78,11 @@ fun MyTasks(userId: Int, userRole: String) {
 }
 
 @Composable
-fun TaskItem(task: Task) {
-    val statusColor = when (task.status) {
-        "Done" -> customGreen
-        "Processing" -> customPurple
+fun StaffItem(staff: Staff) {
+    val statusColor = when (staff.status) {
+        "Busy" -> customPurple
+        "Available" -> customGreen
         else -> Color.Gray
-    }
-
-    val icon = when (task.status) {
-        "Done" -> Icons.Default.Check
-        "Processing" -> Icons.Default.Info
-        else -> null
     }
 
     val showDialog = remember { mutableStateOf(false) }
@@ -102,57 +92,44 @@ fun TaskItem(task: Task) {
             .fillMaxWidth()
             .background(color = statusColor, shape = RoundedCornerShape(15.dp))
             .padding(10.dp)
-            .clickable { showDialog.value = true }, // Show dialog when clicked
+            .clickable { showDialog.value = true },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = task.title,
+            text = staff.name,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        icon?.let {
-            Icon(
-                imageVector = it,
-                contentDescription = "Icon",
-                tint = if (task.status == "Done") Color.Green else Color.Blue,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-        }
-        if (task.status == "Done") {
+        if (staff.status == "Available") {
             Text(
-                text = task.status,
+                text = staff.status,
                 fontStyle = FontStyle.Italic,
-                color = Color.Green,
-                modifier = Modifier.padding(end = 8.dp)
+                color = Color.Green
+            )
+        } else {
+            Text(
+                text = staff.taskId.toString(),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 10.dp)
             )
         }
     }
 
-    // Alert Dialog
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Task Details", fontWeight = FontWeight.Bold) },
+            title = { Text("Staff Details", fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text(text = "Task Name: ${task.title}")
-                    Text(text = "Description: ${task.description}")
-                    Text(text = "Status: ${task.status}")
+                    Text(text = "Name: ${staff.name}")
+                    Text(text = "Status: ${staff.status}")
+                    Text(text = "Task ID: ${staff.taskId}")
                 }
             },
             confirmButton = {
-                if (task.status == "Processing") {
-                    Button(onClick = { /* Perform action for asking help */ }) {
-                        Text("Ask Help")
-                    }
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog.value = false },
-                ) {
-                    Text("Cancel")
+                Button(onClick = { showDialog.value = false }) {
+                    Text("Close")
                 }
             }
         )

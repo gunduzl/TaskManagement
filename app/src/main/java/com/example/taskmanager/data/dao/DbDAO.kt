@@ -54,6 +54,15 @@ interface DbDAO {
     @Query("SELECT * FROM Staff WHERE id = :staffId")
     suspend fun getStaffById(staffId: Int): Staff
 
+    @Query("SELECT * FROM Staff WHERE id = :managerId")
+    suspend fun getDepartmentManagerById(managerId: Int): DepartmentManager
+
+
+
+    @Query("SELECT * FROM Staff WHERE departmentManagerId = :managerId")
+    fun getStaffByManager(managerId: Int): List<Staff>
+
+
     // Task methods
     @Insert
     suspend fun insertTask(task: Task)
@@ -88,5 +97,16 @@ interface DbDAO {
 
     @Update
     suspend fun updateTask(task: Task)
+
+    // authentication
+    @Query("SELECT * FROM Staff WHERE email = :email AND password = :password")
+    suspend fun authenticateStaff(email: String, password: String): Staff?
+
+    @Query("SELECT * FROM DepartmentManager WHERE email = :email AND password = :password")
+    suspend fun authenticateManager(email: String, password: String): DepartmentManager?
+
+    @Query("SELECT * FROM CTO WHERE email = :email AND password = :password")
+    suspend fun authenticateCTO(email: String, password: String): CTO?
+
 
 }
