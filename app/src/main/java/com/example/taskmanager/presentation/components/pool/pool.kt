@@ -1,4 +1,4 @@
-package com.example.taskmanager.components.pool
+package com.example.taskmanager.presentation.components.pool
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

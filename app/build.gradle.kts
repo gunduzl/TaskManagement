@@ -89,6 +89,9 @@ dependencies {
 
     // Kotlin extensions and Room coroutine support
     implementation("androidx.room:room-ktx:2.5.2")
+
+    implementation ("androidx.compose.runtime:runtime-livedata:1.4.3")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
 }
 
 /*

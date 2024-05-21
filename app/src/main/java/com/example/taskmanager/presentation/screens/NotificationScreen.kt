@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 
 
 import androidx.compose.material3.AlertDialog
@@ -9,8 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.taskmanager.components.Notification
-import com.example.taskmanager.components.Notifications
+import com.example.taskmanager.presentation.components.Notification
+import com.example.taskmanager.presentation.components.Notifications
 
 @Composable
 fun NotificationScreen(onClose: () -> Unit) {

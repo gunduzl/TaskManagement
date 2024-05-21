@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 
 import MyTeam_A
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.taskmanager.profileComponents.MyTeam_B
-import com.example.taskmanager.profileComponents.MyTeam_C
+import com.example.taskmanager.presentation.profileComponents.MyTeam_B
+import com.example.taskmanager.presentation.profileComponents.MyTeam_C
 
 
 //elif

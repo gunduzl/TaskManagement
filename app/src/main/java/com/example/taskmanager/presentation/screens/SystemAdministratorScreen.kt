@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

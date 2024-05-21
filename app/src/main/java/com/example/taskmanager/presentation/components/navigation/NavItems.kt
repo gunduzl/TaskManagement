@@ -1,4 +1,4 @@
-package com.example.taskmanager.components.navigation
+package com.example.taskmanager.presentation.components.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home

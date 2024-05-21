@@ -1,4 +1,4 @@
-package com.example.taskmanager.profileComponents
+package com.example.taskmanager.presentation.profileComponents
 
 
 import androidx.compose.foundation.background

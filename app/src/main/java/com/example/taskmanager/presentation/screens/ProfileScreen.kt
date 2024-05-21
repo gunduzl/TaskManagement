@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.taskmanager.profileComponents.MyTasks
+import com.example.taskmanager.presentation.profileComponents.MyTasks
 
 
 @Composable
