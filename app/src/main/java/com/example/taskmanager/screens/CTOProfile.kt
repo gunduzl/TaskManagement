@@ -1,7 +1,6 @@
 package com.example.taskmanager.screens
 
 import MyTeam_A
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,8 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.taskmanager.profileComponents.MyTeam_B
 import com.example.taskmanager.profileComponents.MyTeam_C
@@ -40,10 +44,21 @@ enum class Team {
 @Composable
 fun CTOProfile() {
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Team.TEAM_A) }
+    val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+
+    Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
+        Button(onClick = {
+        }
+        ) {
+            Text("Logout")
+        }
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(start = 20.dp, end = 20.dp)) {
+        val ctoName = "KYNC"
+        CTOProfileHeader(ctoName, setShowNotification) // Pass setShowNotification function
         // Navigation bar
         TeamNavigationBar(selectedTeam, setSelectedTeam)
         // Display team details based on the selected team
@@ -52,6 +67,9 @@ fun CTOProfile() {
             Team.TEAM_B -> MyTeam_B()
             Team.TEAM_C -> MyTeam_C()
         }
+    }
+    if (showNotification) {
+        NotificationScreen(onClose = { setShowNotification(false) })
     }
 }
 
@@ -114,44 +132,45 @@ fun TeamNavigationButton(
 }
 
 
-
 @Composable
-fun StaffItem(name: String, status: String, task: String?, statusColor: Color) {
-    Row(
+fun CTOProfileHeader(ctoName: String, setShowNotification: (Boolean) -> Unit) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = statusColor.copy(alpha = 0.2f), shape = MaterialTheme.shapes.medium)
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(top = 10.dp, start = 20.dp)
     ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.headlineMedium,
-        )
-        if (status == "Available") {
-            Text(
-                text = status,
-                style = MaterialTheme.typography.headlineMedium,
-                color = statusColor
-            )
-        } else {
-            if (task != null) {
-                Text(
-                    text = task,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
+        LazyColumn {
+            item {
+                // Button for Notifications
+                Button(onClick = { setShowNotification(true) }) {
+                    Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                }
             }
+
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Profile Icon
+                    ProfileIcon(icon = Icons.Default.Person)
+
+                    Spacer(modifier = Modifier.width(25.dp))
+
+                    // CTO Details
+                    Column {
+                        Text(
+                            text = ctoName,
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "CTO",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            // You can add additional items or details here as needed
         }
     }
-}
-
-@Composable
-fun TeamDetails(teamDetails: String) {
-    Text(
-        text = teamDetails,
-        style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.padding(top = 16.dp)
-    )
 }

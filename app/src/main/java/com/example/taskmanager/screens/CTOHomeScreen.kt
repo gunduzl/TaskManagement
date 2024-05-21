@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -51,18 +50,15 @@ fun CTOHomeScreen(){
     var taskDueDate by remember { mutableStateOf("") }
     var taskDifficulty by remember { mutableStateOf("") }
     var dropdownExpanded by remember { mutableStateOf(false) }
-    val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Department.DEPARTMENT_1,) }
+    val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Department.DEPARTMENT_1) }
+    val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
 
 
     Row(horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth().padding(start=20.dp, end=20.dp,top=10.dp)) {
 
-        Button(onClick = { /*TODO*/ }) {
-            Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
-        }
-
-        Button(onClick = { showAddDialog = true }) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = null )
+        Button(onClick = { setShowNotification(true) }) {
+            Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
         }
     }
 
@@ -169,6 +165,10 @@ fun CTOHomeScreen(){
         )
     }
 
+    if (showNotification) {
+        NotificationScreen(onClose = { setShowNotification(false) })
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(start = 10.dp, end = 10.dp, top =65.dp)) {
@@ -176,7 +176,7 @@ fun CTOHomeScreen(){
         TeamNavigationBar(selectedTeam, setSelectedTeam)
         // Display team details based on the selected team
         when (selectedTeam) {
-            Department.DEPARTMENT_1, -> Department_1()
+            Department.DEPARTMENT_1 -> Department_1()
             Department.DEPARTMENT_2-> Department_2()
             Department.DEPARTMENT_3 -> Department_3()
         }
@@ -187,23 +187,23 @@ fun CTOHomeScreen(){
 @Composable
 fun Department_3() {
 
-    Pool("Open", Color(0x666650a4), "Implement the profile page")
-    Pool("Active",  Color(0x666790a4),"Create a leaderboard interface")
+    Pool("Open", Color(0x666650a4), "Implement the profile page",false)
+    Pool("Active",  Color(0x666790a4),"Create a leaderboard interface",false)
 
 }
 
 @Composable
 fun Department_2() {
 
-    Pool("Open", Color(0x666650a4),"Prepare presentation to customers")
-    Pool("Active",Color(0x666790a4),"Create a product development plan")
+    Pool("Open", Color(0x666650a4),"Prepare presentation to customers",false)
+    Pool("Active",Color(0x666790a4),"Product development plan",false)
 }
 
 @Composable
 fun Department_1() {
 
-    Pool("Open", Color(0x666650a4), "Develop and admin panel")
-    Pool("Active", Color(0x666790a4), "Modify the database")
+    Pool("Open", Color(0x666650a4), "Develop and admin panel",false)
+    Pool("Active", Color(0x666790a4), "Modify the database",false)
 }
 
 

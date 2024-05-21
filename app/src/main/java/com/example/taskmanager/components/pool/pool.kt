@@ -1,152 +1,49 @@
 package com.example.taskmanager.components.pool
 
-/*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-
-@Composable
-fun Pool(name: String, rowcolor: Color){
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .size(width = 800.dp, height = 280.dp)
-                .padding(top = 30.dp, start = 20.dp, end = 10.dp)
-            ,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text(text = "$name Tasks", fontSize = 25.sp, fontWeight = FontWeight.Bold)
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .background(SolidColor(Color.White), shape = RoundedCornerShape(15.dp))
-                //.size(width = 800.dp, height = 250.dp)
-            ) {
-                items(10) { index ->
-                    Task(name = "elif", col = rowcolor, name)
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-            }
-        }
-    }
-
-
-}
-
-@Composable
-fun Task(name: String, col: Color, openornot: String){
-    Row(
-        modifier = Modifier
-            .background(color = col, shape = RoundedCornerShape(15.dp))
-            .border(2.dp, color = col, shape = RoundedCornerShape(15.dp))
-            .fillMaxWidth()
-            .padding(10.dp)
-            .height(60.dp)
-            .clickable {  },
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-
-
-    ){
-        Text(text = "Text $name", fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
-
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            if(openornot == "Open"){
-                Button(
-                    onClick = { /* Handle button click */ },
-
-                    ) {
-                    Icon(imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(50.dp)  )
-                }
-
-            }
-
-        }
-
-    }
-}
-*/
-import android.view.View
-import android.view.View.ALPHA
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.taskmanager.ui.theme.Pink40
+import com.example.taskmanager.ui.theme.customGreen
+import com.example.taskmanager.ui.theme.customPurple
 
 
 @Composable
-fun Pool(name: String, rowcolor: Color, text:String){
+fun Pool(name: String, rowcolor: Color, text:String, isStaff: Boolean){
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -164,13 +61,40 @@ fun Pool(name: String, rowcolor: Color, text:String){
                 //.size(width = 800.dp, height = 250.dp)
             ) {
                 items(10) { index ->
-                    Task(name = text,
-                        description = "Develop an admin panel by using Jetpack Compose via Android Studio",
-                        expectedFinishDate = "5 May 2024",
-                        timeLeft = "8 days",
-                        difficulty = "Hard",
-                        col = rowcolor,
-                        openornot = name )
+
+                    if((name == "Active") && (isStaff == false) ){
+                        if(index < 3){
+                            Task(name = text,
+                                description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                                expectedFinishDate = "5 May 2024",
+                                timeLeft = "8 days",
+                                difficulty = "Hard",
+                                col = rowcolor,
+                                openornot = name ,
+                                isHelp = true)
+                        }
+                        else{
+                            Task(name = text,
+                                description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                                expectedFinishDate = "5 May 2024",
+                                timeLeft = "8 days",
+                                difficulty = "Hard",
+                                col = rowcolor,
+                                openornot = name ,
+                                isHelp = false)
+                        }
+                    }
+                    else{
+                        Task(name = text,
+                            description = "Develop an admin panel by using Jetpack Compose via Android Studio",
+                            expectedFinishDate = "5 May 2024",
+                            timeLeft = "8 days",
+                            difficulty = "Hard",
+                            col = rowcolor,
+                            openornot = name ,
+                            isHelp = false)
+                    }
+
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
@@ -180,8 +104,9 @@ fun Pool(name: String, rowcolor: Color, text:String){
 
 }
 
+
 @Composable
-fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String){
+fun Task(name: String, description: String, expectedFinishDate: String, timeLeft: String, difficulty: String, col: Color, openornot: String, isHelp: Boolean){
     var showDialog by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -189,7 +114,7 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
             .border(2.dp, color = col, shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
-            .height(60.dp)
+            .height(70.dp)
             .clickable { showDialog = true },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -197,19 +122,57 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
     ){
 
-        Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+        if (isHelp == true){
+            Column{
+                Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+                Row {
+                    CustomButton(
+                        text = "Confirm",
+                        onClick = { /* Handle button click */ },
+                        backgroundColor = Color(0x777730ff),
+                        contentColor = Color.White,
+                        cornerRadius = 15.dp,
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                    )
+                    CustomButton(
+                        text = "Reject",
+                        onClick = { /* Handle button click */ },
+                        backgroundColor = customPurple, //0x666650ff
+                        contentColor = Color.White,
+                        cornerRadius = 15.dp,
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
 
-            contentAlignment = Alignment.BottomEnd
-        ) {
+
+            }
+        }
+        else{
+            Text(text = name, fontSize = 20.sp, textAlign = TextAlign.Left , fontWeight = FontWeight.Bold)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
+
+                contentAlignment = Alignment.BottomEnd
+            ) {
+
+
+            }
 
 
         }
-
 
 
     }
@@ -302,7 +265,7 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
 
             },
             confirmButton = {
-                ALPHA
+                customGreen
             },
             dismissButton = {
                 Button(
@@ -314,4 +277,34 @@ fun Task(name: String, description: String, expectedFinishDate: String, timeLeft
         )
     }
 
+}
+
+@Composable
+fun CustomButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.Blue,
+    contentColor: Color = Color.White,
+    cornerRadius: Dp = 15.dp,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            //.height(10.dp)
+            .padding(horizontal = 5.dp)
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(backgroundColor),
+
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        //contentPadding = PaddingValues(horizontal = 10.dp)
+       // contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = text,
+            color = contentColor,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
+        )
+    }
 }

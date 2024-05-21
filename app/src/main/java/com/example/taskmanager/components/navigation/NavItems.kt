@@ -3,6 +3,7 @@ package com.example.taskmanager.components.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -31,7 +32,7 @@ val listOfNavItems : List<NavItem> = listOf(
     ),
     NavItem(
         label = "SystemAdministrator",
-        icon = Icons.Default.Person,
+        icon = Icons.Default.Share,
         route = Screens.SystemAdministratorScreen.name
     )/*
     NavItem(

@@ -1,6 +1,7 @@
 package com.example.taskmanager.screens
 
 import MyTeam_A
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +38,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ManagerProfile() {
+
+    val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,8 +49,15 @@ fun ManagerProfile() {
     ) {
         LazyColumn {
             item {
-                Button(onClick = { }) {
-                    Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                Row(horizontalArrangement = Arrangement.spacedBy(187.dp)) {
+                    Button(onClick = { setShowNotification(true)}) {
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
+                    }
+                    Button(onClick = {
+                        // Add your logout logic here
+                    }) {
+                        Text("Logout")
+                    }
                 }
             }
 
@@ -129,6 +142,10 @@ fun ManagerProfile() {
         ) {
             MyTeam_A()
         }
+    }
+
+    if (showNotification) {
+        NotificationScreen(onClose = { setShowNotification(false) })
     }
 }
 
