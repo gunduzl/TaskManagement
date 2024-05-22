@@ -1,4 +1,4 @@
-package com.example.taskmanager.components.navigation
+package com.example.taskmanager.presentation.components.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -22,14 +22,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.data.repository.DbRepo
-import com.example.taskmanager.screens.CTOHomeScreen
-import com.example.taskmanager.screens.CTOProfile
-import com.example.taskmanager.screens.HomeScreen
-import com.example.taskmanager.screens.LeaderBoardScreen
-import com.example.taskmanager.screens.ManagerHomeScreen
-import com.example.taskmanager.screens.ManagerProfile
-import com.example.taskmanager.screens.ProfileScreen
-import com.example.taskmanager.screens.SystemAdministratorScreen
+import com.example.taskmanager.presentation.screens.CTOHomeScreen
+import com.example.taskmanager.presentation.screens.CTOProfile
+import com.example.taskmanager.presentation.screens.HomeScreen
+import com.example.taskmanager.presentation.screens.LeaderBoardScreen
+import com.example.taskmanager.presentation.screens.ManagerHomeScreen
+import com.example.taskmanager.presentation.screens.ManagerProfile
+import com.example.taskmanager.presentation.screens.ProfileScreen
+import com.example.taskmanager.presentation.screens.SystemAdministratorScreen
 
 
 

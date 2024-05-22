@@ -1,4 +1,5 @@
-package com.example.taskmanager.profileComponents
+package com.example.taskmanager.presentation.profileComponents
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,12 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +34,7 @@ import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
 
 @Composable
-fun MyTasks() {
+fun MyTeam_C() {
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -46,7 +43,7 @@ fun MyTasks() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "My Tasks",
+                text = "My Team",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 10.dp)
@@ -57,18 +54,22 @@ fun MyTasks() {
                     .fillMaxWidth()
                     .weight(1f) // Occupy half of the available vertical space
             ) {
-                val tasks = listOf(
-                    Task("Task A", "Done", null),
-                    Task("Task B", "Processing", null),
-                    Task("Task C", "Processing", null)
-                ).sortedBy { it.status != "Processing" }
+                val staffList = listOf(
+                    Staff("Gunduz", "Available", null, Color.Green),
+                    Staff("Ali", "Busy", "Task A", Color.Red),
+                    Staff("Alper", "Available", null, Color.Green),
+                    Staff("Elif", "Busy", "Task C", Color.Red),
+                    Staff("Ayşegül", "Busy", "Task A", Color.Red),
+                    Staff("Sadık", "Available", null, Color.Green),
+                    Staff("Eren", "Busy", "Task B", Color.Red)
+                )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(tasks) { task ->
-                        TaskItem(task)
+                    items(staffList) { staff ->
+                        StaffffItem(staff)
                     }
                 }
             }
@@ -76,88 +77,60 @@ fun MyTasks() {
     }
 }
 
-data class Task(val name: String, val status: String, val staffName: String?)
+data class Staff(val name: String, val status: String, val task: String?, var statusColor: Color)
 
 @Composable
-fun TaskItem(task: Task) {
-    val statusColor = when (task.status) {
-        "Done" -> customGreen
-        "Processing" -> customPurple
-        else -> Color.Gray
-    }
-
-    val icon = when (task.status) {
-        "Done" -> Icons.Default.Check
-        "Processing" -> Icons.Default.Info
-        else -> null
-    }
+fun StaffffItem(staff: Staff) {
+    val statusColor = if (staff.status == "Busy") customPurple else customGreen
 
     val showDialog = remember { mutableStateOf(false) }
+
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = statusColor, shape = RoundedCornerShape(15.dp))
             .padding(10.dp)
-            .clickable { showDialog.value = true }, // Show dialog when clicked
+            .clickable { showDialog.value = true },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = task.name,
+            text = staff.name,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        icon?.let {
-            Icon(
-                imageVector = it,
-                contentDescription = "Icon",
-                tint = if (task.status == "Done") Color.Green else Color.Blue,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-        }
-        if (task.status == "Done") {
+        if (staff.status == "Available") {
             Text(
-                text = task.status,
+                text = staff.status,
                 fontStyle = FontStyle.Italic,
-                color = Color.Green,
-                modifier = Modifier.padding(end = 8.dp)
+                color = Color.Green
             )
         } else {
-            if (task.staffName != null) {
+            staff.task?.let {
                 Text(
-                    text = "Assigned to ${task.staffName}",
+                    text = it,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 10.dp, end = 8.dp)
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
         }
     }
 
-    // Alert Dialog
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Task Details", fontWeight = FontWeight.Bold) },
+            title = { Text("Staff Details", fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text(text = "Task Name: ${task.name}")
-                    Text(text = "Status: ${task.status}")
-                    task.staffName?.let { Text(text = "Assigned to: $it") }
+                    Text(text = "Name: ${staff.name}")
+                    Text(text = "Status: ${staff.status}")
+                    staff.task?.let { Text(text = "Task: $it") }
                 }
             },
             confirmButton = {
-                if (task.status == "Processing") {
-                    Button(onClick = { /* Perform action for asking help */ }) {
-                        Text("Ask Help")
-                    }
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog.value = false },
-                ) {
-                    Text("Cancel")
+                Button(onClick = { showDialog.value = false }) {
+                    Text("Close")
                 }
             }
         )

@@ -7,9 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.taskmanager.data.dao.DbDao
 
 import com.example.taskmanager.data.map.*
-//import com.example.taskmanager.data.map.SarInfo
-//import com.example.taskmanager.data.users.SupplyRequestsTable
-//import com.example.taskmanager.data.users.UserTable
+
 
 @Database(
     entities = [

@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.taskmanager.components.pool.Pool
+import com.example.taskmanager.presentation.components.pool.Pool
 
 
 enum class Department {
@@ -177,7 +177,7 @@ fun CTOHomeScreen(){
         // Display team details based on the selected team
         when (selectedTeam) {
             Department.DEPARTMENT_1 -> Department_1()
-            Department.DEPARTMENT_2-> Department_2()
+            Department.DEPARTMENT_2 -> Department_2()
             Department.DEPARTMENT_3 -> Department_3()
         }
     }
@@ -255,7 +255,7 @@ fun TeamNavigationButton(
             Text(text = when (team) {
                 Department.DEPARTMENT_1 -> "Depr 1"
                 Department.DEPARTMENT_2 -> "Depr 2"
-                Department.DEPARTMENT_3-> "Depr 3"
+                Department.DEPARTMENT_3 -> "Depr 3"
             })
         }
     }

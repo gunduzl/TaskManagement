@@ -1,4 +1,4 @@
-package com.example.taskmanager.screens
+package com.example.taskmanager.presentation.screens
 
 import MyTeam_A
 import androidx.compose.foundation.layout.Arrangement

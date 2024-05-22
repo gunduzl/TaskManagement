@@ -1,4 +1,4 @@
-package com.example.taskmanager.components.navigation
+package com.example.taskmanager.presentation.components.navigation
 
 enum class Screens(val route: String) {
     Leaderboard("leaderboard"),
