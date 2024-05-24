@@ -27,22 +27,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.taskmanager.profileComponents.MyTasks
-
+import com.example.taskmanager.profileComponents.out.*
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(repo: Repository, staffId: Int) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+    val staff = remember { mutableStateOf<Staff?>(null) }
+
+    LaunchedEffect(staffId) {
+        staff.value = repo.getStaffById(staffId)
+    }
 
     Column(
         modifier = Modifier
@@ -74,12 +76,12 @@ fun ProfileScreen() {
                     // Manager Details
                     Column {
                         Text(
-                            text = "Staff Name",
+                            text = staff.value?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Department Name",
+                            text = staff.value?.let { "Department ${it.departmentId}" } ?: "Loading...",
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -131,7 +133,6 @@ fun ProfileScreen() {
                 }
             }
             item {
-                //
                 Spacer(modifier = Modifier.height(35.dp))
             }
         }
@@ -141,7 +142,7 @@ fun ProfileScreen() {
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            MyTasks()
+            MyTasks(repo = repo, staffId = staffId)
         }
     }
 

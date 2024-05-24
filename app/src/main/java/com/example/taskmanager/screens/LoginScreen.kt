@@ -1,3 +1,4 @@
+package com.example.taskmanager
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,12 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.example.taskmanager.profileComponents.out.Employee
+import com.example.taskmanager.profileComponents.out.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
-fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
+fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId: Int) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -58,11 +65,17 @@ fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            val userRole = authenticateUser(email, password)
-            if (userRole.isNotEmpty()) {
-                onLoginSuccess(userRole)
-            } else {
-                errorMessage = "User not found or invalid credentials"
+            CoroutineScope(Dispatchers.IO).launch {
+                val employee = authenticateUser(repo, email, password)
+                if (employee != null) {
+                    withContext(Dispatchers.Main) {
+                        onLoginSuccess(employee.role.name.lowercase(), employee.id)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        errorMessage = "User not found or invalid credentials"
+                    }
+                }
             }
         }) {
             Text(text = "Login")
@@ -86,25 +99,6 @@ fun LoginScreen(onLoginSuccess: (userRole: String) -> Unit) {
     }
 }
 
-// Dummy authentication function, replace it with your actual authentication logic
-fun authenticateUser(email: String, password: String): String {
-    val dummyData = mapOf(
-        "staff@example.com" to "password",
-        "manager@example.com" to "password",
-        "cto@example.com" to "password",
-        "admin@example.com" to "password"
-    )
-    val userRole = when {
-        dummyData[email] == password -> {
-            when (email) {
-                "staff@example.com" -> "staff"
-                "manager@example.com" -> "manager"
-                "cto@example.com" -> "cto"
-                "admin@example.com" -> "admin"
-                else -> ""
-            }
-        }
-        else -> ""
-    }
-    return userRole
+suspend fun authenticateUser(repo: Repository, email: String, password: String): Employee? {
+    return repo.getEmployeeByEmailAndPassword(email, password)
 }

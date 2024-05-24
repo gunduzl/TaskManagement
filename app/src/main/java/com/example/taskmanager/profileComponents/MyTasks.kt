@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,9 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
+import com.example.taskmanager.profileComponents.out.*
 
 @Composable
-fun MyTasks() {
+fun MyTasks(repo: Repository, staffId: Int) {
+    val tasks = remember { mutableStateOf<List<TaskWithStaff>>(emptyList()) }
+
+    LaunchedEffect(staffId) {
+        tasks.value = repo.getTaskFromStaff(staffId)
+    }
+
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -57,18 +65,13 @@ fun MyTasks() {
                     .fillMaxWidth()
                     .weight(1f) // Occupy half of the available vertical space
             ) {
-                val tasks = listOf(
-                    Task("Task A", "Done", null),
-                    Task("Task B", "Processing", null),
-                    Task("Task C", "Processing", null)
-                ).sortedBy { it.status != "Processing" }
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(tasks) { task ->
-                        TaskItem(task)
+                    items(tasks.value) { taskWithStaff ->
+                        TaskItem(taskWithStaff.task, taskWithStaff.staff.map { it.name })
                     }
                 }
             }
@@ -76,19 +79,17 @@ fun MyTasks() {
     }
 }
 
-data class Task(val name: String, val status: String, val staffName: String?)
-
 @Composable
-fun TaskItem(task: Task) {
+fun TaskItem(task: Task, staffNames: List<String>) {
     val statusColor = when (task.status) {
-        "Done" -> customGreen
-        "Processing" -> customPurple
+        TaskStatus.CLOSED -> customGreen
+        TaskStatus.ACTIVE -> customPurple
         else -> Color.Gray
     }
 
     val icon = when (task.status) {
-        "Done" -> Icons.Default.Check
-        "Processing" -> Icons.Default.Info
+        TaskStatus.CLOSED -> Icons.Default.Check
+        TaskStatus.ACTIVE -> Icons.Default.Info
         else -> null
     }
 
@@ -104,7 +105,7 @@ fun TaskItem(task: Task) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = task.name,
+            text = task.title,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
@@ -112,21 +113,21 @@ fun TaskItem(task: Task) {
             Icon(
                 imageVector = it,
                 contentDescription = "Icon",
-                tint = if (task.status == "Done") Color.Green else Color.Blue,
+                tint = if (task.status == TaskStatus.CLOSED) Color.Green else Color.Blue,
                 modifier = Modifier.padding(end = 8.dp)
             )
         }
-        if (task.status == "Done") {
+        if (task.status == TaskStatus.CLOSED) {
             Text(
-                text = task.status,
+                text = task.status.toString(),
                 fontStyle = FontStyle.Italic,
                 color = Color.Green,
                 modifier = Modifier.padding(end = 8.dp)
             )
         } else {
-            if (task.staffName != null) {
+            if (staffNames.isNotEmpty()) {
                 Text(
-                    text = "Assigned to ${task.staffName}",
+                    text = "Assigned to ${staffNames.joinToString()}",
                     fontSize = 14.sp,
                     modifier = Modifier.padding(start = 10.dp, end = 8.dp)
                 )
@@ -141,13 +142,15 @@ fun TaskItem(task: Task) {
             title = { Text("Task Details", fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text(text = "Task Name: ${task.name}")
+                    Text(text = "Task Name: ${task.title}")
                     Text(text = "Status: ${task.status}")
-                    task.staffName?.let { Text(text = "Assigned to: $it") }
+                    staffNames.forEach { staffName ->
+                        Text(text = "Assigned to: $staffName")
+                    }
                 }
             },
             confirmButton = {
-                if (task.status == "Processing") {
+                if (task.status == TaskStatus.ACTIVE) {
                     Button(onClick = { /* Perform action for asking help */ }) {
                         Text("Ask Help")
                     }
