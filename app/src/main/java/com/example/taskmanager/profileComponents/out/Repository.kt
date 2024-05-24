@@ -46,8 +46,8 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskPriority.HIGH, "2023-12-31", 1),
-                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskPriority.MEDIUM, "2023-11-30", 2)
+                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskPriority.HIGH, HelpType.Default, "2023-11-30", 1),
+                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskPriority.MEDIUM, HelpType.Default, "2023-11-30", 2),
             )
         )
     }
@@ -218,12 +218,20 @@ enum class Role {
     ADMIN
 }
 
+enum class HelpType{
+    Default,
+    Requested,
+    Rejected,
+    Confirmed
+}
+
 data class Task(
     val id: Int,
     val title: String,
     val description: String,
     val status: TaskStatus,
     val priority: TaskPriority,
+    val isHelp: HelpType,
     val deadline: String,
     val departmentId: Int
 )
