@@ -31,7 +31,7 @@ class Repository {
         employeeList.addAll(
             listOf(
                 Staff(1, "Alper", "alper@gmail.com", "password", Role.STAFF, 5, StaffStatus.AVAILABLE, 1, 1),
-                Staff(2, "Sadık", "sadık@gmail.com", "password", Role.STAFF, 6, StaffStatus.AVAILABLE, 1, 1),
+                Staff(2, "Sadık", "sadik@gmail.com", "password", Role.STAFF, 6, StaffStatus.AVAILABLE, 1, 1),
                 Staff(3, "Ayşegül", "aysegul@gmail.com", "password", Role.STAFF, 7, StaffStatus.AVAILABLE, 2, 2),
                 Staff(4, "Eren", "eren@gmail.com", "password", Role.STAFF, 8, StaffStatus.AVAILABLE, 2, 2),
                 Staff(5, "Mehmet", "mehmet@gmail.com", "password", Role.STAFF, 9, StaffStatus.AVAILABLE, 3, 3),
