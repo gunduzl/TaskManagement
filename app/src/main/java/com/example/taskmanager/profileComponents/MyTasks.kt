@@ -24,9 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,9 +35,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.profileComponents.out.HelpType
+import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Task
+import com.example.taskmanager.profileComponents.out.TaskStatus
+import com.example.taskmanager.profileComponents.out.TaskWithStaff
 import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
-import com.example.taskmanager.profileComponents.out.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun MyTasks(repo: Repository, staffId: Int) {
@@ -94,6 +100,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
     }
 
     val showDialog = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -151,7 +158,15 @@ fun TaskItem(task: Task, staffNames: List<String>) {
             },
             confirmButton = {
                 if (task.status == TaskStatus.ACTIVE) {
-                    Button(onClick = { /* Perform action for asking help */ }) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                task.isHelp = HelpType.Requested
+                                showDialog.value = false
+                            }
+
+                        }
+                    ) {
                         Text("Ask Help")
                     }
                 }

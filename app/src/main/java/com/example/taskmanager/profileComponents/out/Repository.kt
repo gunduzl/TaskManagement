@@ -9,6 +9,7 @@ class Repository {
     private val taskList = mutableListOf<Task>()
     private val departmentList = mutableListOf<Department>()
     private val taskStaffCrossRefList = mutableListOf<TaskStaffCrossRef>()
+    private val notificationList = mutableListOf<Notification>()
 
     private val mutex = Mutex()
 
@@ -21,21 +22,21 @@ class Repository {
         // Create Departments
         departmentList.addAll(
             listOf(
-                Department(1, "Department 1", "Description 1"),
-                Department(2, "Department 2", "Description 2"),
-                Department(3, "Department 3", "Description 3")
+                Department(1, "Department 1"),
+                Department(2, "Department 2"),
+                Department(3, "Department 3")
             )
         )
 
         // Create Employees
         employeeList.addAll(
             listOf(
-                Staff(1, "Alper", "alper@gmail.com", "password", Role.STAFF, 5, StaffStatus.AVAILABLE, 1, 1),
-                Staff(2, "Sadık", "sadik@gmail.com", "password", Role.STAFF, 6, StaffStatus.AVAILABLE, 1, 1),
-                Staff(3, "Ayşegül", "aysegul@gmail.com", "password", Role.STAFF, 7, StaffStatus.AVAILABLE, 2, 2),
-                Staff(4, "Eren", "eren@gmail.com", "password", Role.STAFF, 8, StaffStatus.AVAILABLE, 2, 2),
-                Staff(5, "Mehmet", "mehmet@gmail.com", "password", Role.STAFF, 9, StaffStatus.AVAILABLE, 3, 3),
-                Staff(6, "Oğuzhan", "oguzhan@gmail.com", "password", Role.STAFF, 10, StaffStatus.AVAILABLE, 3, 3),
+                Staff(1, "Alper", "alper@gmail.com", "password", Role.STAFF, 5, StaffStatus.AVAILABLE, 1, 7),
+                Staff(2, "Sadık", "sadik@gmail.com", "password", Role.STAFF, 6, StaffStatus.AVAILABLE, 1, 7),
+                Staff(3, "Ayşegül", "aysegul@gmail.com", "password", Role.STAFF, 7, StaffStatus.AVAILABLE, 2, 8),
+                Staff(4, "Eren", "eren@gmail.com", "password", Role.STAFF, 8, StaffStatus.AVAILABLE, 2, 8),
+                Staff(5, "Mehmet", "mehmet@gmail.com", "password", Role.STAFF, 9, StaffStatus.AVAILABLE, 3, 9),
+                Staff(6, "Oğuzhan", "oguzhan@gmail.com", "password", Role.STAFF, 10, StaffStatus.AVAILABLE, 3, 9),
                 Manager(7, "Gunduz", "gunduz@gmail.com", "password", Role.MANAGER, 5, 1),
                 Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 6, 2),
                 Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 7, 3),
@@ -46,10 +47,24 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1),
-                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1),
-                Task(3, "Task 3", "Description 1", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1),
-                Task(4, "Task 4", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1)
+                //Alper
+                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1, 15),
+                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1,10),
+                Task(3, "Task 3", "Description 1", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1,15),
+                Task(4, "Task 4", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1,10)
+            )
+        )
+
+        notificationList.addAll(
+            listOf(
+                Notification(1,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 1),
+                Notification(2,"Reminder","Don't forget your meeting at 2 PM","Yesterday", Role.STAFF, 1),
+                Notification(3,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 3),
+                Notification(4,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 4),
+                Notification(5,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 5),
+                Notification(6,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 8),
+                Notification(7,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 9),
+                Notification(8,"New Message", "You have a new message from Jane", "10:30 AM", Role.CTO, 10),
             )
         )
     }
@@ -105,9 +120,45 @@ class Repository {
         return listOf(ManagerWithStaff(manager, staff))
     }
 
+
+
     suspend fun getManagerById(managerId: Int): Manager? = mutex.withLock {
         return employeeList.filterIsInstance<Manager>().find { it.id == managerId }
     }
+
+    suspend fun getDepartmentById(departmentId: Int): Department? = mutex.withLock {
+        return departmentList.find { it.id == departmentId }
+    }
+
+    suspend fun getDepartmentsFromEmployeeID(employeeID: Int): Department? = mutex.withLock {
+        val employee = employeeList.find { it.id == employeeID }
+        val department = when (employee?.role) {
+            Role.STAFF -> employeeList.filterIsInstance<Staff>().find { it.id == employeeID }?.let { staff ->
+                departmentList.find { it.id == staff.departmentId }
+            }
+            Role.MANAGER -> employeeList.filterIsInstance<Manager>().find { it.id == employeeID }?.let { manager ->
+                departmentList.find { it.id == manager.departmentId }
+            }
+            else -> null
+        }
+        println("getDepartmentsFromEmployeeID: employeeID=$employeeID, department=$department")
+        return department
+    }
+
+    suspend fun getPointFromEmployeeID(employeeID: Int): Int? = mutex.withLock {
+        val employee = employeeList.find { it.id == employeeID }
+        return when (employee) {
+            is Staff -> employee.staffPoint
+            is Manager -> employee.managerPoint
+            else -> null
+        }
+    }
+
+    suspend fun getEmployeeById(employeeId: Int): Employee? = mutex.withLock {
+        return employeeList.filterIsInstance<Employee>().find { it.id == employeeId }
+    }
+
+
 
     suspend fun insertTask(task: Task) = mutex.withLock {
         taskList.add(task)
@@ -131,6 +182,12 @@ class Repository {
         return employeeList.filterIsInstance<Staff>().filter { it.id in staffIds }
     }
 
+    // Alper yeni
+    suspend fun getStaffsOfManager(managerId: Int): ManagerWithStaff? = mutex.withLock {
+        val manager = employeeList.filterIsInstance<Manager>().find { it.id == managerId } ?: return null
+        val staff = employeeList.filterIsInstance<Staff>().filter { it.departmentManagerId == managerId }
+        return ManagerWithStaff(manager, staff)
+    }
     suspend fun getActiveTasksFromStaff(staffID: Int): List<TaskWithStaff> = mutex.withLock {
         return getTaskFromStaff(staffID).filter { it.task.status == TaskStatus.ACTIVE }
     }
@@ -173,7 +230,112 @@ class Repository {
             taskList[taskIndex] = task.copy(status = newStatus)
         }
     }
+
+
+    // elif
+    suspend fun deleteEmployeeById(employeeId: Int) = mutex.withLock {
+        val employeeToDelete = employeeList.find { it.id == employeeId }
+        if (employeeToDelete != null) {
+            employeeList.remove(employeeToDelete)
+        }
+    }
+
+    //elif
+    suspend fun deleteDepartmentByName(departmentName: String) = mutex.withLock {
+        val departmentToDelete = departmentList.find { it.name == departmentName }
+        if (departmentToDelete != null) {
+            departmentList.remove(departmentToDelete)
+        }
+    }
+
+    //elif
+    suspend fun updateEmployeeRole(employeeId: Int, newRole: Role) = mutex.withLock {
+        val employeeIndex = employeeList.indexOfFirst { it.id == employeeId }
+        if (employeeIndex != -1) {
+            val existingEmployee = employeeList[employeeIndex]
+            val previousDepartmentId: Int? = when (existingEmployee) {
+                is Staff -> existingEmployee.departmentId
+                is Manager -> existingEmployee.departmentId
+                else -> null
+            }
+            val previousDepartmentManagerId: Int? = when (existingEmployee) {
+                is Staff -> existingEmployee.departmentManagerId
+                else -> null
+            }
+
+            val departmentId = previousDepartmentId ?: 0
+            val departmentManagerId = previousDepartmentManagerId ?: 0
+
+            val newEmployee = when (newRole) {
+                Role.STAFF -> {
+                    val staff = existingEmployee as? Staff
+                    Staff(
+                        existingEmployee.id,
+                        existingEmployee.name,
+                        existingEmployee.email,
+                        existingEmployee.password,
+                        newRole,
+                        staff?.staffPoint ?: 0,
+                        staff?.staffStatus ?: StaffStatus.AVAILABLE,
+                        departmentId,
+                        departmentManagerId
+                    )
+                }
+                Role.MANAGER -> {
+                    val manager = existingEmployee as? Manager
+                    Manager(
+                        existingEmployee.id,
+                        existingEmployee.name,
+                        existingEmployee.email,
+                        existingEmployee.password,
+                        newRole,
+                        manager?.managerPoint ?: 0,
+                        departmentId
+                    )
+                }
+                Role.CTO -> {
+                    CTO(
+                        existingEmployee.id,
+                        existingEmployee.name,
+                        existingEmployee.email,
+                        existingEmployee.password,
+                        newRole
+                    )
+                }
+                else -> existingEmployee // For ADMIN or other cases, keep the existing employee
+            }
+            // Replace the existing employee with the new one
+            employeeList[employeeIndex] = newEmployee
+        }
+    }
+
+    //elif
+    suspend fun getManagerIdByDepartmentName(departmentName: String): Int? = mutex.withLock {
+        val departmentId = departmentList.find { it.name == departmentName }?.id
+        return employeeList.filterIsInstance<Manager>().find { it.departmentId == departmentId }?.id
+    }
+    //elif
+    suspend fun getDepartmentIdByName(departmentName: String): Int? = mutex.withLock {
+        return departmentList.find { it.name == departmentName }?.id
+    }
+
+    //elif
+    suspend fun getAllEmployees(): List<Employee> = mutex.withLock {
+        return employeeList.toList()
+    }
+
+
+    suspend fun getNotificationsById(employeeId: Int): List<Notification> = mutex.withLock {
+        return notificationList.filter { it.employeeId == employeeId }
+    }
+
+    suspend fun insertNotification(notification: Notification) {
+        mutex.withLock {
+            notificationList.add(notification)
+        }
+    }
 }
+
 
 open class Employee(
     val id: Int,
@@ -189,10 +351,12 @@ class Staff(
     email: String,
     password: String,
     role: Role,
-    val staffPoint: Int,
-    val staffStatus: StaffStatus,
+    //Alper
+    var staffPoint: Int,
+    var staffStatus: StaffStatus,
     val departmentId: Int,
-    val departmentManagerId: Int
+    val departmentManagerId: Int,
+    val pointsList: MutableList<Int> = mutableListOf()
 ) : Employee(id, name, email, password, role)
 
 class Manager(
@@ -201,7 +365,7 @@ class Manager(
     email: String,
     password: String,
     role: Role,
-    val managerPoint: Int,
+    var managerPoint: Int,
     val departmentId: Int
 ) : Employee(id, name, email, password, role)
 
@@ -257,11 +421,12 @@ data class Task(
     val id: Int,
     val title: String,
     val description: String,
-    val status: TaskStatus,
+    var status: TaskStatus,
     val difficulty: TaskDifficulty,
-    val isHelp: HelpType,
+    var isHelp: HelpType,
     val deadline: String,
     val departmentId: Int,
+    val taskPoint: Int,
     val owners: List<Staff> = emptyList()
 )
 
@@ -293,6 +458,14 @@ data class ManagerWithStaff(
 
 data class Department(
     val id: Int,
-    val name: String,
-    val description: String
+    val name: String
+)
+
+data class Notification(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val date: String,
+    val employeeType: Role,
+    val employeeId: Int
 )

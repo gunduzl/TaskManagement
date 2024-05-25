@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 @Composable
 fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId: Int) -> Unit) {
     var email by remember { mutableStateOf("") }
@@ -65,6 +64,7 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
+            // Use LaunchedEffect to handle the coroutine
             CoroutineScope(Dispatchers.IO).launch {
                 val employee = authenticateUser(repo, email, password)
                 if (employee != null) {

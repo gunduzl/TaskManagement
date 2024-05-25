@@ -99,7 +99,7 @@ fun CTOProfile(repo: Repository, ctoId: Int) {
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) })
+        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = ctoId)
     }
 }
 
