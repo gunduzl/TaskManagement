@@ -59,6 +59,6 @@ fun HomeScreen(repo: Repository, staffId: Int) {
 
     // Display the NotificationScreen when showNotification is true
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) })
+        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = staffId)
     }
 }

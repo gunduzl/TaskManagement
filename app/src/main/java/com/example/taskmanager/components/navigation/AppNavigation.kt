@@ -26,10 +26,10 @@ import com.example.taskmanager.screens.ManagerHomeScreen
 import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
+
 @Composable
 fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) {
     val navController = rememberNavController()
-
     val repo = remember { Repository() }
 
     Scaffold(
@@ -39,7 +39,6 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) 
                 val currentDestination = navBackStackEntry?.destination
 
                 listOfNavItems.forEach { navItem ->
-                    // Conditionally show navigation items based on user role
                     if (shouldShowNavItem(navItem.route, userRole)) {
                         NavigationBarItem(
                             selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -60,7 +59,8 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) 
                             },
                             label = {
                                 Text(text = navItem.label)
-                            })
+                            }
+                        )
                     }
                 }
             }
@@ -72,22 +72,22 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) 
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Screens.Leaderboard.name) {
-                LeaderBoardScreen()
+                LeaderBoardScreen(repo, employeeId)
             }
             composable(route = Screens.HomeScreen.name) {
                 when (userRole) {
-                    "staff" -> HomeScreen(repo,employeeId)
-                    "manager" -> ManagerHomeScreen(repo,employeeId)
-                    "cto" -> CTOHomeScreen(repo)
-                    "admin" -> HomeScreen(repo,employeeId)
+                    "staff" -> HomeScreen(repo, employeeId)
+                    "manager" -> ManagerHomeScreen(repo, employeeId)
+                    "cto" -> CTOHomeScreen(repo, employeeId)
+                    "admin" -> HomeScreen(repo, employeeId)
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
                 when (userRole) {
-                    "staff" -> ProfileScreen(repo, employeeId)
-                    "manager" -> ProfileScreen(repo, employeeId)
+                    "staff" -> ProfileScreen(repo, employeeId, navControl)
+                    "manager" -> ProfileScreen(repo, employeeId, navControl)
                     "cto" -> CTOProfile(repo, employeeId)
-                    "admin" -> SystemAdministratorScreen()
+                    "admin" -> SystemAdministratorScreen(repo, employeeId)
                 }
             }
         }
@@ -95,7 +95,6 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) 
 }
 
 private fun shouldShowNavItem(route: String, userRole: String): Boolean {
-    // Define navigation items to show for each user role
     val navItemsToShow = mapOf(
         "staff" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),
         "manager" to listOf(Screens.Leaderboard.name, Screens.HomeScreen.name, Screens.ProfileScreen.name),

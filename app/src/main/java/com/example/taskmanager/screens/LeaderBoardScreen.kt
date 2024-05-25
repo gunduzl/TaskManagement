@@ -24,10 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.components.Leaderboard
 import com.example.taskmanager.components.Staff
+import com.example.taskmanager.profileComponents.out.Repository
 
 
 @Composable
-fun LeaderBoardScreen() {
+fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
 
     Column(
@@ -53,7 +54,7 @@ fun LeaderBoardScreen() {
 
         // Display the NotificationScreen when showNotification is true
         if (showNotification) {
-            NotificationScreen(onClose = { setShowNotification(false) })
+            NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = employeeId)
         } else {
 
             val yourLeaderboardList: List<Staff> = listOf(

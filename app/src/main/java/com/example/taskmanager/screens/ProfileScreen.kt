@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -26,26 +25,35 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.MyTasks
+import com.example.taskmanager.profileComponents.MyTeam
+import com.example.taskmanager.profileComponents.out.Department
+import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
-import com.example.taskmanager.profileComponents.out.Staff
 
 @Composable
-fun ProfileScreen(repo: Repository, employeeId: Int) {
+fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavController) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
-    val staff = remember { mutableStateOf<Staff?>(null) }
+    var employee by remember { mutableStateOf<Employee?>(null) }
+    var employeeRole by remember { mutableStateOf<Role?>(null) }
+    var employeeDepartment by remember { mutableStateOf<Department?>(null) }
+    var employeePoint by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(employeeId) {
-        staff.value = repo.getStaffById(employeeId)
+        employee = repo.getEmployeeById(employeeId)
+        employeeRole = employee?.role
+        employeeDepartment = repo.getDepartmentsFromEmployeeID(employeeId)
+        employeePoint = repo.getPointFromEmployeeID(employeeId)
     }
 
     Column(
@@ -61,7 +69,10 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
                         Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                     }
                     Button(onClick = {
-                        // Add your logout logic here
+                        // Navigate back to the login screen
+                        navController.navigate("/first_screen") {
+                            popUpTo("/app-navigation") { inclusive = true }
+                        }
                     }) {
                         Text("Logout")
                     }
@@ -70,20 +81,18 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
 
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Profile Icon
-                    ProfileIconn(icon = Icons.Default.Person)
+                    ProfileIcon(icon = Icons.Default.Person)
 
                     Spacer(modifier = Modifier.width(25.dp))
 
-                    // Manager Details
                     Column {
                         Text(
-                            text = staff.value?.name ?: "Loading...",
+                            text = employee?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = staff.value?.let { "Department ${it.departmentId}" } ?: "Loading...",
+                            text = employeeDepartment?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -95,16 +104,14 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth() // Fill the maximum width available
-                        .wrapContentHeight() // Wrap the height based on content
-                        .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding for spacing
-                        .offset(x = 65.dp, y = 30.dp) // Adjust the position on the screen
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .offset(x = 65.dp, y = 30.dp)
                 ) {
-                    // Manager Points
                     Surface(
-                        modifier = Modifier
-                            .size(180.dp, 50.dp),
-                        color = MaterialTheme.colorScheme.primary, // Set your desired background color here
+                        modifier = Modifier.size(180.dp, 50.dp),
+                        color = MaterialTheme.colorScheme.primary,
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
@@ -112,21 +119,20 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Star, // Example icon, replace with appropriate icon
+                                imageVector = Icons.Default.Star,
                                 contentDescription = "Points Icon",
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = "Points: ${staff.value?.staffPoint ?: "Loading..."}",
+                                text = "Points: ${employeePoint ?: "Loading..."}",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = Color.White,
-                                modifier = Modifier
-                                    .offset(x = 8.dp , y = 0.dp) // Occupy maximum available width
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)
                             )
                             Spacer(modifier = Modifier.width(20.dp))
                             Icon(
-                                imageVector = Icons.Default.Star, // Example icon, replace with appropriate icon
+                                imageVector = Icons.Default.Star,
                                 contentDescription = "Points Icon",
                                 modifier = Modifier.size(24.dp)
                             )
@@ -134,6 +140,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
                     }
                 }
             }
+
             item {
                 Spacer(modifier = Modifier.height(35.dp))
             }
@@ -144,28 +151,18 @@ fun ProfileScreen(repo: Repository, employeeId: Int) {
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            // check employee is manager or staff
-            if (staff.value?.role == Role.MANAGER) {
-                // Display ManagerProfile screen
-            } else {
-                MyTasks(repo = repo, staffId = employeeId)
+            val role = employeeRole
+            if (role != null) {
+                when (role) {
+                    Role.MANAGER -> MyTeam(repo = repo, managerId = employeeId)
+                    Role.STAFF -> MyTasks(repo = repo, staffId = employeeId)
+                    else -> Unit
+                }
             }
         }
     }
 
-    // Display the NotificationScreen when showNotification is true
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) })
+        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = employeeId)
     }
-}
-
-@Composable
-fun ProfileIconn(icon: ImageVector) {
-    Icon(
-        imageVector = icon,
-        contentDescription = "Profile Icon",
-        modifier = Modifier
-            .size(72.dp)
-            .clip(CircleShape)
-    )
 }

@@ -1,3 +1,4 @@
+package com.example.taskmanager.profileComponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +47,7 @@ fun MyTeam(repo: Repository, managerId: Int) {
         coroutineScope.launch {
             val managerWithStaff = repo.getManagerWithStaff(managerId)
             staffList.value = managerWithStaff.firstOrNull()?.staff ?: emptyList()
+            println("Manager ID: $managerId, Staff List: ${staffList.value}")
         }
     }
 
@@ -62,11 +64,11 @@ fun MyTeam(repo: Repository, managerId: Int) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
-            Spacer(modifier = Modifier.height(10.dp)) // Add spacer to create space before LazyColumn
+            Spacer(modifier = Modifier.height(10.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // Occupy half of the available vertical space
+                    .weight(1f)
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),

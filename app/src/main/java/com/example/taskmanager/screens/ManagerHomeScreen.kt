@@ -39,6 +39,7 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskDifficulty
 import com.example.taskmanager.profileComponents.out.TaskStatus
+import com.example.taskmanager.systems.EvaluationSystem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,6 +57,8 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     var openTasks by remember { mutableStateOf(emptyList<Task>()) }
     var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
 
+
+
     fun refreshTasks() {
         coroutineScope.launch {
             val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
@@ -66,6 +69,18 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
             }
         }
     }
+
+    /*
+    fun addTaskToPool(taskName: String,taskDescription: String, taskDifficulty: TaskDifficulty ){
+        coroutineScope.launch {
+            val manager = repo.getManagerById(managerId)
+            if(manager != null){
+               val task = Task(10, taskName, taskDescription, TaskStatus.OPEN, taskDifficulty, HelpType.Default, taskDueDate, manager.departmentId)
+                repo.insertTask(task)
+            }
+        }
+
+    }*/
 
     LaunchedEffect(managerId) {
         refreshTasks()
@@ -94,7 +109,13 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                 modifier = Modifier.padding(end = 20.dp, start = 40.dp)
             )
 
-            Button(onClick = { showAddDialog = true }) {
+            Button(onClick = {
+                showAddDialog = true
+                taskName = ""
+                taskDescription = ""
+                taskDueDate = ""
+                dropdownExpanded = false
+            }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }
@@ -122,7 +143,12 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                         TextField(
                             value = taskDescription,
                             onValueChange = { taskDescription = it },
-                            label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold) },
+                            label = {
+                                Text(
+                                    "Enter Task Description:",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                             modifier = Modifier.height(100.dp)
                         )
@@ -169,7 +195,9 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                 dropdownExpanded = false
                             })
                         }
+
                     }
+
                 },
                 confirmButton = {
                     Button(
@@ -185,6 +213,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                         difficulty = taskDifficulty,
                                         isHelp = HelpType.Default,
                                         deadline = taskDueDate,
+                                        taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
                                         departmentId = manager.departmentId
                                     )
                                     repo.insertTask(task)
@@ -192,10 +221,8 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                 }
                             }
                             showAddDialog = false
-                            taskName = ""
-                            taskDescription = ""
-                            taskDueDate = ""
-                            dropdownExpanded = false
+
+
                         }
                     ) {
                         Text("Add")
@@ -219,6 +246,6 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) })
+        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = managerId)
     }
 }

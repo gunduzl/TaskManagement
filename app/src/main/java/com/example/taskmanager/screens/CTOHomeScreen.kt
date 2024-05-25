@@ -42,6 +42,7 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskDifficulty
 import com.example.taskmanager.profileComponents.out.TaskStatus
+import com.example.taskmanager.systems.EvaluationSystem
 import kotlinx.coroutines.launch
 
 enum class CTODepartment {
@@ -51,12 +52,12 @@ enum class CTODepartment {
 }
 
 @Composable
-fun CTOHomeScreen(repo: Repository) {
+fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     var showAddDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDueDate by remember { mutableStateOf("") }
-    var taskDifficulty by remember { mutableStateOf("") }
+    var taskDifficulty by remember {  mutableStateOf(TaskDifficulty.LOW) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(CTODepartment.DEPARTMENT_1) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
@@ -91,7 +92,15 @@ fun CTOHomeScreen(repo: Repository) {
 
     if (showAddDialog) {
         AlertDialog(
-            onDismissRequest = { showAddDialog = false },
+            onDismissRequest = {
+                showAddDialog = false
+                taskName = ""
+                taskDescription = ""
+                taskDueDate = ""
+                taskDifficulty = TaskDifficulty.LOW
+                dropdownExpanded = false
+
+            },
             title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
             text = {
                 Column(
@@ -130,7 +139,7 @@ fun CTOHomeScreen(repo: Repository) {
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         Text(
-                            text = taskDifficulty.takeIf { it.isNotBlank() } ?: "Select",
+                            text = taskDifficulty.name
                         )
                     }
                     DropdownMenu(
@@ -139,15 +148,15 @@ fun CTOHomeScreen(repo: Repository) {
                         modifier = Modifier
                     ) {
                         DropdownMenuItem(text = { Text("Easy") }, onClick = {
-                            taskDifficulty = "Easy"
+                            taskDifficulty = TaskDifficulty.LOW
                             dropdownExpanded = false
                         })
                         DropdownMenuItem(text = { Text("Medium") }, onClick = {
-                            taskDifficulty = "Medium"
+                            taskDifficulty = TaskDifficulty.MEDIUM
                             dropdownExpanded = false
                         })
                         DropdownMenuItem(text = { Text("Hard") }, onClick = {
-                            taskDifficulty = "Hard"
+                            taskDifficulty = TaskDifficulty.HIGH
                             dropdownExpanded = false
                         })
                     }
@@ -157,29 +166,31 @@ fun CTOHomeScreen(repo: Repository) {
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            val task = Task(
-                                id = 0, // Replace with your task ID generation logic
-                                title = taskName,
-                                description = taskDescription,
-                                status = TaskStatus.OPEN,
-                                difficulty = TaskDifficulty.valueOf(taskDifficulty.uppercase()),
-                                isHelp = HelpType.Default,
-                                deadline = taskDueDate,
-                                departmentId = when (selectedTeam) {
-                                    CTODepartment.DEPARTMENT_1 -> 1
-                                    CTODepartment.DEPARTMENT_2 -> 2
-                                    CTODepartment.DEPARTMENT_3 -> 3
-                                }
-                            )
-                            repo.insertTask(task)
-                            refreshTasks()
+                            val cto = repo.getCTOById(ctoId)
+                            if(cto != null){
+                                val task = Task(
+                                    id = 0, // Replace with your task ID generation logic
+                                    title = taskName,
+                                    description = taskDescription,
+                                    status = TaskStatus.OPEN,
+                                    difficulty = taskDifficulty,
+                                    isHelp = HelpType.Default,
+                                    deadline = taskDueDate,
+                                    taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
+                                    departmentId = when (selectedTeam) {
+                                        CTODepartment.DEPARTMENT_1 -> 1
+                                        CTODepartment.DEPARTMENT_2 -> 2
+                                        CTODepartment.DEPARTMENT_3 -> 3
+                                    }
+                                )
+                                repo.insertTask(task)
+                                refreshTasks()
+
+                            }
+
                         }
                         showAddDialog = false
-                        taskName = ""
-                        taskDescription = ""
-                        taskDueDate = ""
-                        taskDifficulty = ""
-                        dropdownExpanded = false
+
                     },
                 ) {
                     Text("Add")
@@ -192,7 +203,7 @@ fun CTOHomeScreen(repo: Repository) {
                         taskName = ""
                         taskDescription = ""
                         taskDueDate = ""
-                        taskDifficulty = ""
+                        taskDifficulty = TaskDifficulty.LOW
                         dropdownExpanded = false
                     },
                 ) {
@@ -203,7 +214,7 @@ fun CTOHomeScreen(repo: Repository) {
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) })
+        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = ctoId)
     }
 
     Column(
