@@ -23,7 +23,6 @@ import com.example.taskmanager.screens.CTOProfile
 import com.example.taskmanager.screens.HomeScreen
 import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
-import com.example.taskmanager.screens.ManagerProfile
 import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
 
@@ -77,17 +76,17 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int) 
             }
             composable(route = Screens.HomeScreen.name) {
                 when (userRole) {
-                    "staff" -> HomeScreen()
-                    "manager" -> ManagerHomeScreen()
-                    "cto" -> CTOHomeScreen()
-                    "admin" -> HomeScreen()
+                    "staff" -> HomeScreen(repo,employeeId)
+                    "manager" -> ManagerHomeScreen(repo,employeeId)
+                    "cto" -> CTOHomeScreen(repo)
+                    "admin" -> HomeScreen(repo,employeeId)
                 }
             }
             composable(route = Screens.ProfileScreen.name) {
                 when (userRole) {
                     "staff" -> ProfileScreen(repo, employeeId)
-                    "manager" -> ManagerProfile()
-                    "cto" -> CTOProfile()
+                    "manager" -> ProfileScreen(repo, employeeId)
+                    "cto" -> CTOProfile(repo, employeeId)
                     "admin" -> SystemAdministratorScreen()
                 }
             }

@@ -1,5 +1,3 @@
-package com.example.taskmanager.profileComponents
-
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,8 +19,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,11 +30,25 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Staff
+import com.example.taskmanager.profileComponents.out.StaffStatus
 import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
+import kotlinx.coroutines.launch
 
 @Composable
-fun MyTeam_C() {
+fun MyTeam(repo: Repository, managerId: Int) {
+    val staffList = remember { mutableStateOf<List<Staff>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(managerId) {
+        coroutineScope.launch {
+            val managerWithStaff = repo.getManagerWithStaff(managerId)
+            staffList.value = managerWithStaff.firstOrNull()?.staff ?: emptyList()
+        }
+    }
+
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -54,22 +68,13 @@ fun MyTeam_C() {
                     .fillMaxWidth()
                     .weight(1f) // Occupy half of the available vertical space
             ) {
-                val staffList = listOf(
-                    Staff("Gunduz", "Available", null, Color.Green),
-                    Staff("Ali", "Busy", "Task A", Color.Red),
-                    Staff("Alper", "Available", null, Color.Green),
-                    Staff("Elif", "Busy", "Task C", Color.Red),
-                    Staff("Ayşegül", "Busy", "Task A", Color.Red),
-                    Staff("Sadık", "Available", null, Color.Green),
-                    Staff("Eren", "Busy", "Task B", Color.Red)
-                )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(staffList) { staff ->
-                        StaffffItem(staff)
+                    items(staffList.value) { staff ->
+                        StaffItem(staff)
                     }
                 }
             }
@@ -77,14 +82,11 @@ fun MyTeam_C() {
     }
 }
 
-data class Staff(val name: String, val status: String, val task: String?, var statusColor: Color)
-
 @Composable
-fun StaffffItem(staff: Staff) {
-    val statusColor = if (staff.status == "Busy") customPurple else customGreen
+fun StaffItem(staff: Staff) {
+    val statusColor = if (staff.staffStatus == StaffStatus.BUSY) customPurple else customGreen
 
     val showDialog = remember { mutableStateOf(false) }
-
 
     Row(
         modifier = Modifier
@@ -100,20 +102,18 @@ fun StaffffItem(staff: Staff) {
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-        if (staff.status == "Available") {
+        if (staff.staffStatus == StaffStatus.AVAILABLE) {
             Text(
-                text = staff.status,
+                text = "Available",
                 fontStyle = FontStyle.Italic,
                 color = Color.Green
             )
         } else {
-            staff.task?.let {
-                Text(
-                    text = it,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
+            Text(
+                text = "Busy",
+                fontStyle = FontStyle.Italic,
+                color = Color.Red
+            )
         }
     }
 
@@ -124,8 +124,9 @@ fun StaffffItem(staff: Staff) {
             text = {
                 Column {
                     Text(text = "Name: ${staff.name}")
-                    Text(text = "Status: ${staff.status}")
-                    staff.task?.let { Text(text = "Task: $it") }
+                    Text(text = "Email: ${staff.email}")
+                    Text(text = "Department ID: ${staff.departmentId}")
+                    Text(text = "Status: ${staff.staffStatus}")
                 }
             },
             confirmButton = {

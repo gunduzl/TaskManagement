@@ -25,9 +25,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,15 +35,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.taskmanager.profileComponents.MyTasks
-import com.example.taskmanager.profileComponents.out.*
+import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Role
+import com.example.taskmanager.profileComponents.out.Staff
 
 @Composable
-fun ProfileScreen(repo: Repository, staffId: Int) {
+fun ProfileScreen(repo: Repository, employeeId: Int) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val staff = remember { mutableStateOf<Staff?>(null) }
 
-    LaunchedEffect(staffId) {
-        staff.value = repo.getStaffById(staffId)
+    LaunchedEffect(employeeId) {
+        staff.value = repo.getStaffById(employeeId)
     }
 
     Column(
@@ -116,7 +118,7 @@ fun ProfileScreen(repo: Repository, staffId: Int) {
                             )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(
-                                text = "Points:9",
+                                text = "Points: ${staff.value?.staffPoint ?: "Loading..."}",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = Color.White,
                                 modifier = Modifier
@@ -142,7 +144,12 @@ fun ProfileScreen(repo: Repository, staffId: Int) {
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            MyTasks(repo = repo, staffId = staffId)
+            // check employee is manager or staff
+            if (staff.value?.role == Role.MANAGER) {
+                // Display ManagerProfile screen
+            } else {
+                MyTasks(repo = repo, staffId = employeeId)
+            }
         }
     }
 

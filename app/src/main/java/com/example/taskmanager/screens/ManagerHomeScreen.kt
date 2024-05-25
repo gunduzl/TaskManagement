@@ -21,9 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,25 +34,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.components.pool.Pool
-
-
-
+import com.example.taskmanager.profileComponents.out.HelpType
+import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Task
+import com.example.taskmanager.profileComponents.out.TaskDifficulty
+import com.example.taskmanager.profileComponents.out.TaskStatus
+import kotlinx.coroutines.launch
 
 @Composable
-fun ManagerHomeScreen(){
-
-
+fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     var showAddDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDueDate by remember { mutableStateOf("") }
-    var taskDifficulty by remember { mutableStateOf("") }
+    var taskDifficulty by remember { mutableStateOf(TaskDifficulty.LOW) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val totalTask = remember { mutableStateOf(0) }
 
+    var openTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
 
+    fun refreshTasks() {
+        coroutineScope.launch {
+            val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
+            val manager = repo.getManagerById(managerId)
+            if (manager != null) {
+                openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, manager.departmentId)
+                activeTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE, manager.departmentId)
+            }
+        }
+    }
 
-
+    LaunchedEffect(managerId) {
+        refreshTasks()
+    }
 
     Column(
         modifier = Modifier
@@ -59,42 +78,39 @@ fun ManagerHomeScreen(){
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(180.dp)
-        ){
-            Button(onClick = { setShowNotification(true)}) {
-                Icon(imageVector = Icons.Default.Notifications, contentDescription = null )
+        ) {
+            Button(onClick = { setShowNotification(true) }) {
+                Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
             }
-
         }
 
         Row(
-            modifier = Modifier.padding(top=20.dp)
+            modifier = Modifier.padding(top = 20.dp)
         ) {
-            Text(text = "My Department",
+            Text(
+                text = "My Department",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end= 20.dp, start= 40.dp)
+                modifier = Modifier.padding(end = 20.dp, start = 40.dp)
             )
 
-            Button(onClick = { showAddDialog = true  }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null )
+            Button(onClick = { showAddDialog = true }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }
 
-        Pool("Open", Color(0x666650a4),"Develop and admin panel",false) //0xFFF0F8FF
-        Pool("Active", Color(0x666790a4),"Develop and admin panel",false) //0xFFFFADB0
+        // Pools
+        Pool(managerId, "Open", Color(0x666650a4), openTasks, false, repo, ::refreshTasks)
+        Pool(managerId, "Active", Color(0x666790a4), activeTasks, false, repo, ::refreshTasks)
 
-        if (showAddDialog ) {
+        if (showAddDialog) {
             AlertDialog(
                 onDismissRequest = { showAddDialog = false },
                 title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
                 text = {
-                    Column (
+                    Column(
                         modifier = Modifier
                             .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
-
-                            //.border(BorderStroke(width = 4.dp, color = Color.Black))
-
-
                     ) {
                         TextField(
                             value = taskName,
@@ -109,22 +125,21 @@ fun ManagerHomeScreen(){
                             label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                             modifier = Modifier.height(100.dp)
-
                         )
-
 
                         TextField(
                             value = taskDueDate,
                             onValueChange = { taskDueDate = it },
                             label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-
                         )
 
-                        Row(verticalAlignment = Alignment.CenterVertically,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top=20.dp)
-                                .clickable { dropdownExpanded = true }) {
+                                .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                                .clickable { dropdownExpanded = true }
+                        ) {
                             Text(
                                 text = "Select Difficulty:",
                                 fontWeight = FontWeight.Bold,
@@ -132,41 +147,56 @@ fun ManagerHomeScreen(){
                                 modifier = Modifier.padding(end = 8.dp)
                             )
                             Text(
-                                text = taskDifficulty.takeIf { it.isNotBlank() } ?: "Select",
-
-                                )
-                        }
-                        DropdownMenu(expanded = dropdownExpanded,
-                            onDismissRequest = { /*TODO*/ },
-                            modifier = Modifier) {
-
-                            DropdownMenuItem(text = { Text("Easy")}, onClick = {
-                                taskDifficulty = "Easy"
-                                dropdownExpanded = false
-                            })
-                            DropdownMenuItem(text = { Text("Medium")}, onClick = {
-                                taskDifficulty = "Medium"
-                                dropdownExpanded = false
-                            })
-                            DropdownMenuItem(text = { Text("Hard")}, onClick = {
-                                taskDifficulty = "hard"
-                                dropdownExpanded = false
-                            })
+                                text = taskDifficulty.name
+                            )
                         }
 
+                        DropdownMenu(
+                            expanded = dropdownExpanded,
+                            onDismissRequest = { dropdownExpanded = false },
+                            modifier = Modifier
+                        ) {
+                            DropdownMenuItem(text = { Text("Easy") }, onClick = {
+                                taskDifficulty = TaskDifficulty.LOW
+                                dropdownExpanded = false
+                            })
+                            DropdownMenuItem(text = { Text("Medium") }, onClick = {
+                                taskDifficulty = TaskDifficulty.MEDIUM
+                                dropdownExpanded = false
+                            })
+                            DropdownMenuItem(text = { Text("Hard") }, onClick = {
+                                taskDifficulty = TaskDifficulty.HIGH
+                                dropdownExpanded = false
+                            })
+                        }
                     }
-
                 },
                 confirmButton = {
                     Button(
                         onClick = {
+                            coroutineScope.launch {
+                                val manager = repo.getManagerById(managerId)
+                                if (manager != null) {
+                                    val task = Task(
+                                        id = totalTask.value +1 , // Replace with your task ID generation logic
+                                        title = taskName,
+                                        description = taskDescription,
+                                        status = TaskStatus.OPEN,
+                                        difficulty = taskDifficulty,
+                                        isHelp = HelpType.Default,
+                                        deadline = taskDueDate,
+                                        departmentId = manager.departmentId
+                                    )
+                                    repo.insertTask(task)
+                                    refreshTasks()
+                                }
+                            }
                             showAddDialog = false
                             taskName = ""
                             taskDescription = ""
                             taskDueDate = ""
-                            taskDifficulty = ""
                             dropdownExpanded = false
-                                  },
+                        }
                     ) {
                         Text("Add")
                     }
@@ -178,10 +208,8 @@ fun ManagerHomeScreen(){
                             taskName = ""
                             taskDescription = ""
                             taskDueDate = ""
-                            taskDifficulty = ""
                             dropdownExpanded = false
-
-                            },
+                        }
                     ) {
                         Text("Cancel")
                     }
@@ -189,8 +217,8 @@ fun ManagerHomeScreen(){
             )
         }
     }
+
     if (showNotification) {
         NotificationScreen(onClose = { setShowNotification(false) })
     }
-
 }

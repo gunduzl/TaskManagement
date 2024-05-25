@@ -30,15 +30,15 @@ class Repository {
         // Create Employees
         employeeList.addAll(
             listOf(
-                Staff(1, "Alper", "alper@gmail.com", "password", Role.STAFF, 1, 1),
-                Staff(2, "Sadık", "sadık@gmail.com", "password", Role.STAFF, 1, 1),
-                Staff(3, "Ayşegül", "aysegul@gmail.com", "password", Role.STAFF, 2, 2),
-                Staff(4, "Eren", "eren@gmail.com", "password", Role.STAFF, 2, 2),
-                Staff(5, "Mehmet", "mehmet@gmail.com", "password", Role.STAFF, 3, 3),
-                Staff(6, "Oğuzhan", "oguzhan@gmail.com", "password", Role.STAFF, 3, 3),
-                Manager(7, "Gunduz", "gunduz@gmail.com", "password", Role.MANAGER, 1),
-                Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 2),
-                Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 3),
+                Staff(1, "Alper", "alper@gmail.com", "password", Role.STAFF, 5, StaffStatus.AVAILABLE, 1, 1),
+                Staff(2, "Sadık", "sadık@gmail.com", "password", Role.STAFF, 6, StaffStatus.AVAILABLE, 1, 1),
+                Staff(3, "Ayşegül", "aysegul@gmail.com", "password", Role.STAFF, 7, StaffStatus.AVAILABLE, 2, 2),
+                Staff(4, "Eren", "eren@gmail.com", "password", Role.STAFF, 8, StaffStatus.AVAILABLE, 2, 2),
+                Staff(5, "Mehmet", "mehmet@gmail.com", "password", Role.STAFF, 9, StaffStatus.AVAILABLE, 3, 3),
+                Staff(6, "Oğuzhan", "oguzhan@gmail.com", "password", Role.STAFF, 10, StaffStatus.AVAILABLE, 3, 3),
+                Manager(7, "Gunduz", "gunduz@gmail.com", "password", Role.MANAGER, 5, 1),
+                Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 6, 2),
+                Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 7, 3),
                 CTO(10, "Elif", "cto@example.com", "password", Role.CTO)
             )
         )
@@ -46,8 +46,10 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskPriority.HIGH, HelpType.Default, "2023-11-30", 1),
-                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskPriority.MEDIUM, HelpType.Default, "2023-11-30", 2),
+                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1),
+                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1),
+                Task(3, "Task 3", "Description 1", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1),
+                Task(4, "Task 4", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1)
             )
         )
     }
@@ -146,14 +148,32 @@ class Repository {
     }
 
     suspend fun takeTask(staffID: Int, taskID: Int) = mutex.withLock {
+        val staff = employeeList.filterIsInstance<Staff>().find { it.id == staffID } ?: return
         taskStaffCrossRefList.add(TaskStaffCrossRef(taskID, staffID))
+        val taskIndex = taskList.indexOfFirst { it.id == taskID }
+        if (taskIndex != -1) {
+            val task = taskList[taskIndex]
+            val updatedOwners = task.owners.toMutableList().apply { add(staff) }
+            taskList[taskIndex] = task.copy(status = TaskStatus.ACTIVE, owners = updatedOwners)
+        }
     }
 
     suspend fun updateCTO(cto: CTO) = mutex.withLock {
         employeeList.replaceAll { if (it.id == cto.id) cto else it }
     }
-}
 
+    suspend fun updateStaff(staff: Staff) = mutex.withLock {
+        employeeList.replaceAll { if (it.id == staff.id) staff else it }
+    }
+
+    suspend fun updateTaskStatus(taskId: Int, newStatus: TaskStatus) = mutex.withLock {
+        val taskIndex = taskList.indexOfFirst { it.id == taskId }
+        if (taskIndex != -1) {
+            val task = taskList[taskIndex]
+            taskList[taskIndex] = task.copy(status = newStatus)
+        }
+    }
+}
 
 open class Employee(
     val id: Int,
@@ -169,6 +189,8 @@ class Staff(
     email: String,
     password: String,
     role: Role,
+    val staffPoint: Int,
+    val staffStatus: StaffStatus,
     val departmentId: Int,
     val departmentManagerId: Int
 ) : Employee(id, name, email, password, role)
@@ -179,6 +201,7 @@ class Manager(
     email: String,
     password: String,
     role: Role,
+    val managerPoint: Int,
     val departmentId: Int
 ) : Employee(id, name, email, password, role)
 
@@ -199,13 +222,18 @@ class Admin(
 ) : Employee(id, name, email, password, role)
 
 
+enum class StaffStatus {
+    AVAILABLE,
+    BUSY
+}
+
 enum class TaskStatus {
     OPEN,
     ACTIVE,
     CLOSED
 }
 
-enum class TaskPriority {
+enum class TaskDifficulty {
     LOW,
     MEDIUM,
     HIGH
@@ -218,7 +246,7 @@ enum class Role {
     ADMIN
 }
 
-enum class HelpType{
+enum class HelpType {
     Default,
     Requested,
     Rejected,
@@ -230,10 +258,11 @@ data class Task(
     val title: String,
     val description: String,
     val status: TaskStatus,
-    val priority: TaskPriority,
+    val difficulty: TaskDifficulty,
     val isHelp: HelpType,
     val deadline: String,
-    val departmentId: Int
+    val departmentId: Int,
+    val owners: List<Staff> = emptyList()
 )
 
 data class TaskStaffCrossRef(
@@ -261,9 +290,9 @@ data class ManagerWithStaff(
     val manager: Manager,
     val staff: List<Staff>
 )
+
 data class Department(
     val id: Int,
     val name: String,
     val description: String
 )
-
