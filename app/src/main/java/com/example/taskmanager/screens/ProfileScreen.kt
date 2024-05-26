@@ -40,6 +40,8 @@ import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 @Composable
 fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavController) {
@@ -49,11 +51,23 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
     var employeeDepartment by remember { mutableStateOf<Department?>(null) }
     var employeePoint by remember { mutableStateOf<Int?>(null) }
 
-    LaunchedEffect(employeeId) {
+
+    suspend fun refreshProfileScreen(){
         employee = repo.getEmployeeById(employeeId)
         employeeRole = employee?.role
         employeeDepartment = repo.getDepartmentsFromEmployeeID(employeeId)
         employeePoint = repo.getPointFromEmployeeID(employeeId)
+    }
+
+    suspend fun refreshPagePeriodically() {
+        while (true) {
+            refreshProfileScreen()
+            delay(1000)
+        }
+    }
+    LaunchedEffect(employeeId) {
+        refreshPagePeriodically()
+
     }
 
     Column(
@@ -124,6 +138,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
+
                             Text(
                                 text = "Points: ${employeePoint ?: "Loading..."}",
                                 style = MaterialTheme.typography.titleLarge,
