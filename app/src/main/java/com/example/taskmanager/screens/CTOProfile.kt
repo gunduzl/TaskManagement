@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
@@ -49,8 +50,13 @@ import com.example.taskmanager.ui.theme.customPurple
 import kotlinx.coroutines.launch
 
 @Composable
+<<<<<<< HEAD
 fun CTOProfile(repo: Repository, ctoId: Int) {
     val (selectedDepartmentId, setSelectedDepartmentId) = remember { mutableStateOf<Int?>(null) }
+=======
+fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
+    val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Team.TEAM_A) }
+>>>>>>> 19e37bacbc888d18c3c1189f6c22446676797680
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val ctoName = remember { mutableStateOf("Loading...") }
     val departments = remember { mutableStateOf<List<Department>>(emptyList()) }
@@ -73,6 +79,9 @@ fun CTOProfile(repo: Repository, ctoId: Int) {
     Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
         Button(onClick = {
             // Add your logout logic here
+            navController.navigate("/first_screen") {
+                popUpTo("/app-navigation") { inclusive = true }
+            }
         }) {
             Text("Logout")
         }
