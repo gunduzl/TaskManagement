@@ -1,7 +1,10 @@
 package com.example.taskmanager.profileComponents.out
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.Timer
+import java.util.TimerTask
 
 class Repository {
 
@@ -40,7 +43,7 @@ class Repository {
                 Manager(7, "Gunduz", "gunduz@gmail.com", "password", Role.MANAGER, 5, 1),
                 Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 6, 2),
                 Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 7, 3),
-                CTO(10, "Elif", "cto@example.com", "password", Role.CTO),
+                CTO(10, "Elif", "cto@gmail.com", "password", Role.CTO),
                 Admin(11,"Oguzhan","admin@gmail.com","password",Role.ADMIN)
             )
         )
@@ -48,11 +51,11 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                //Alper
-                Task(1, "Task 1", "Description 1", TaskStatus.ACTIVE, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1, 15),
-                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1,10),
-                Task(3, "Task 3", "Description 1", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, "2023-11-30", 1,15),
-                Task(4, "Task 4", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, "2023-11-30", 1,10)
+                // Alper
+                Task(1, "Task 1", "Description 1", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 5),
+                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 6),
+                Task(3, "Task 3", "Description 3", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 7),
+                Task(4, "Task 4", "Description 4", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 8)
             )
         )
 
@@ -65,12 +68,10 @@ class Repository {
                 Notification(5,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 5),
                 Notification(6,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 8),
                 Notification(7,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 9),
-                Notification(8,"New Message", "You have a new message from Jane", "10:30 AM", Role.CTO, 10),
+                Notification(8,"New Message", "You have a new message from Jane", "10:30 AM", Role.CTO, 10)
             )
         )
     }
-
-
 
     suspend fun getEmployeeByEmailAndPassword(email: String, password: String): Employee? = mutex.withLock {
         return employeeList.find { it.email == email && it.password == password }
@@ -123,8 +124,6 @@ class Repository {
         return listOf(ManagerWithStaff(manager, staff))
     }
 
-
-
     suspend fun getManagerById(managerId: Int): Manager? = mutex.withLock {
         return employeeList.filterIsInstance<Manager>().find { it.id == managerId }
     }
@@ -161,10 +160,42 @@ class Repository {
         return employeeList.filterIsInstance<Employee>().find { it.id == employeeId }
     }
 
-
-
     suspend fun insertTask(task: Task) = mutex.withLock {
-        taskList.add(task)
+        val creationTime = System.currentTimeMillis()
+        val newTask = task.copy(creationTime = creationTime)
+        taskList.add(newTask)
+        scheduleTaskDeadlineNotification(newTask)
+    }
+
+    private fun scheduleTaskDeadlineNotification(task: Task) {
+        val delay: Long = 30 * 1000L // 30 seconds in milliseconds
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                sendTaskDeadlineNotification(task)
+            }
+        }, delay)
+    }
+
+
+    private fun sendTaskDeadlineNotification(task: Task) {
+        val relatedStaff = task.owners
+        relatedStaff.forEach { staff ->
+            val notification = Notification(
+                id = generateNotificationId(),
+                title = "Task Deadline Reached",
+                description = "The deadline for task '${task.title}' has been reached.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.STAFF,
+                employeeId = staff.id
+            )
+            runBlocking {
+                insertNotification(notification)
+            }
+        }
+    }
+
+    private fun generateNotificationId(): Int {
+        return (notificationList.maxOfOrNull { it.id } ?: 0) + 1
     }
 
     suspend fun insertTaskStaffCrossRef(crossRef: TaskStaffCrossRef) = mutex.withLock {
@@ -185,12 +216,12 @@ class Repository {
         return employeeList.filterIsInstance<Staff>().filter { it.id in staffIds }
     }
 
-    // Alper yeni
     suspend fun getStaffsOfManager(managerId: Int): ManagerWithStaff? = mutex.withLock {
         val manager = employeeList.filterIsInstance<Manager>().find { it.id == managerId } ?: return null
         val staff = employeeList.filterIsInstance<Staff>().filter { it.departmentManagerId == managerId }
         return ManagerWithStaff(manager, staff)
     }
+
     suspend fun getActiveTasksFromStaff(staffID: Int): List<TaskWithStaff> = mutex.withLock {
         return getTaskFromStaff(staffID).filter { it.task.status == TaskStatus.ACTIVE }
     }
@@ -214,7 +245,9 @@ class Repository {
         if (taskIndex != -1) {
             val task = taskList[taskIndex]
             val updatedOwners = task.owners.toMutableList().apply { add(staff) }
-            taskList[taskIndex] = task.copy(status = TaskStatus.ACTIVE, owners = updatedOwners)
+            val updatedTask = task.copy(status = TaskStatus.ACTIVE, owners = updatedOwners)
+            taskList[taskIndex] = updatedTask
+            scheduleTaskDeadlineNotification(updatedTask)
         }
     }
 
@@ -226,7 +259,6 @@ class Repository {
         employeeList.replaceAll { if (it.id == staff.id) staff else it }
     }
 
-    // Bu bozuk
     suspend fun updateTaskStatus(taskId: Int, newStatus: TaskStatus) = mutex.withLock {
         val taskIndex = taskList.indexOfFirst { it.id == taskId }
         if (taskIndex != -1) {
@@ -235,8 +267,6 @@ class Repository {
         }
     }
 
-
-    // elif
     suspend fun deleteEmployeeById(employeeId: Int) = mutex.withLock {
         val employeeToDelete = employeeList.find { it.id == employeeId }
         if (employeeToDelete != null) {
@@ -244,15 +274,8 @@ class Repository {
         }
     }
 
-    //elif
-    suspend fun deleteDepartmentByName(departmentName: String) = mutex.withLock {
-        val departmentToDelete = departmentList.find { it.name == departmentName }
-        if (departmentToDelete != null) {
-            departmentList.remove(departmentToDelete)
-        }
-    }
 
-    //elif
+
     suspend fun updateEmployeeRole(employeeId: Int, newRole: Role) = mutex.withLock {
         val employeeIndex = employeeList.indexOfFirst { it.id == employeeId }
         if (employeeIndex != -1) {
@@ -313,21 +336,18 @@ class Repository {
         }
     }
 
-    //elif
     suspend fun getManagerIdByDepartmentName(departmentName: String): Int? = mutex.withLock {
         val departmentId = departmentList.find { it.name == departmentName }?.id
         return employeeList.filterIsInstance<Manager>().find { it.departmentId == departmentId }?.id
     }
-    //elif
+
     suspend fun getDepartmentIdByName(departmentName: String): Int? = mutex.withLock {
         return departmentList.find { it.name == departmentName }?.id
     }
 
-    //elif
     suspend fun getAllEmployees(): List<Employee> = mutex.withLock {
         return employeeList.toList()
     }
-
 
     suspend fun getNotificationsById(employeeId: Int): List<Notification> = mutex.withLock {
         return notificationList.filter { it.employeeId == employeeId }
@@ -338,8 +358,40 @@ class Repository {
             notificationList.add(notification)
         }
     }
-}
 
+
+    suspend fun deleteDepartmentByName(departmentName: String) = mutex.withLock {
+        val departmentToDelete = departmentList.find { it.name == departmentName }
+        if (departmentToDelete != null) {
+            // Remove employees associated with the department
+            val employeesToRemove = mutableListOf<Employee>()
+            employeesToRemove.addAll(employeeList.filter { (it is Staff ) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Manager ) && it.departmentId == departmentToDelete.id })
+            employeeList.removeAll(employeesToRemove)
+
+            // Remove the department
+            departmentList.remove(departmentToDelete)
+        }
+    }
+
+    suspend fun deleteDepartmentById(departmentId: Int) = mutex.withLock {
+        val departmentToDelete = departmentList.find { it.id == departmentId }
+        if (departmentToDelete != null) {
+            // Remove employees associated with the department
+            val employeesToRemove = mutableListOf<Employee>()
+            employeesToRemove.addAll(employeeList.filter { (it is Staff ) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Manager ) && it.departmentId == departmentToDelete.id })
+            employeeList.removeAll(employeesToRemove)
+
+            // Remove the department
+            departmentList.remove(departmentToDelete)
+        }
+    }
+    suspend fun getAllDepartments(): List<Department> = mutex.withLock {
+        return departmentList.toList()
+    }
+
+}
 
 open class Employee(
     val id: Int,
@@ -423,12 +475,13 @@ enum class HelpType {
 
 data class Task(
     val id: Int,
-    val title: String,
+    var title: String,
     val description: String,
     var status: TaskStatus,
     val difficulty: TaskDifficulty,
     var isHelp: HelpType,
-    val deadline: String,
+    val creationTime: Long, // new field
+    val deadline: String, // new field
     val departmentId: Int,
     val taskPoint: Int,
     val owners: List<Staff> = emptyList()

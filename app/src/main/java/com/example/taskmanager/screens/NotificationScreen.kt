@@ -1,6 +1,5 @@
 package com.example.taskmanager.screens
 
-
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,46 +28,52 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.taskmanager.profileComponents.out.*
+import com.example.taskmanager.profileComponents.out.Notification
+import com.example.taskmanager.profileComponents.out.Repository
 import kotlinx.coroutines.launch
 
 @Composable
 fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
-    val alertDialogState = remember { mutableStateOf(true) } // Set alertDialogState to true by default
+    val alertDialogState = remember { mutableStateOf(true) }
     val notificationsList = remember { mutableStateOf<List<Notification>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(employeeId) {
-        coroutineScope.launch {
-            val notifications = repo.getNotificationsById(employeeId)
-            notificationsList.value = notifications
+    LaunchedEffect(alertDialogState.value) {
+        if (alertDialogState.value) {
+            coroutineScope.launch {
+                val notifications = repo.getNotificationsById(employeeId)
+                notificationsList.value = notifications
+            }
         }
     }
 
-    AlertDialog(
-        onDismissRequest = { alertDialogState.value = false },
-        title = {
-            Text(
-                text = "Notifications",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Notifications(notificationsList.value)
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    alertDialogState.value = false
-                    onClose()
+    if (alertDialogState.value) {
+        AlertDialog(
+            onDismissRequest = { alertDialogState.value = false },
+            title = {
+                Text(
+                    text = "Notifications",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Notifications(notificationsList.value)
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        alertDialogState.value = false
+                        onClose()
+                    }
+                ) {
+                    Text("Close")
                 }
-            ) {
-                Text("Close")
             }
-        }
-    )
+        )
+    }
 }
+
 @Composable
 fun Notifications(notifications: List<Notification>) {
     LazyColumn(
@@ -94,7 +99,7 @@ fun NotificationItem(notification: Notification) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp) // Adjust inner padding here
+                .padding(8.dp)
         ){
             Text(
                 text = notification.title,
@@ -120,6 +125,5 @@ fun NotificationItem(notification: Notification) {
                 )
             }
         }
-
     }
 }

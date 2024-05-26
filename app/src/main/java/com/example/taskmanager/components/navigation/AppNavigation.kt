@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.taskmanager.profileComponents.out.RepositoryViewModel
+import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.screens.CTOHomeScreen
 import com.example.taskmanager.screens.CTOProfile
 import com.example.taskmanager.screens.HomeScreen
@@ -25,9 +24,6 @@ import com.example.taskmanager.screens.LeaderBoardScreen
 import com.example.taskmanager.screens.ManagerHomeScreen
 import com.example.taskmanager.screens.ProfileScreen
 import com.example.taskmanager.screens.SystemAdministratorScreen
-
-import com.example.taskmanager.profileComponents.out.Repository
-import com.example.taskmanager.screens.*
 
 @Composable
 fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int, repo: Repository) {
@@ -88,7 +84,7 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int, 
                     "staff" -> ProfileScreen(repo, employeeId, navControl)
                     "manager" -> ProfileScreen(repo, employeeId, navControl)
                     "cto" -> CTOProfile(repo, employeeId, navControl)
-                    "admin" -> SystemAdministratorScreen(repo, employeeId)
+                    "admin" -> SystemAdministratorScreen(repo, employeeId, navControl)
                 }
             }
         }

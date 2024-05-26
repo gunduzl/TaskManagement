@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,8 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.out.CTO
 import com.example.taskmanager.profileComponents.out.Department
+import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.Manager
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
@@ -47,16 +50,23 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun SystemAdministratorScreen(repo: Repository,employeeId: Int) {
-
-
-
+fun SystemAdministratorScreen(repo: Repository,employeeId: Int, navController: NavController) {
     MaterialTheme {
+        Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp, bottom = 200.dp)) {
+            Button(onClick = {
+                // Navigate back to the login screen
+                navController.navigate("/first_screen") {
+                    popUpTo("/app-navigation") { inclusive = true }
+                }
+            }) {
+                Text("Logout")
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(800.dp)
-                .padding(top = 30.dp, start = 20.dp, end = 10.dp),
+                .padding(top = 70.dp, start = 20.dp, end = 10.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             LazyColumn(
@@ -90,10 +100,16 @@ fun CreateEmployee(repo: Repository) {
     var employeeType by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var dropdownExpanded by remember { mutableStateOf(false) }
+    var departments by remember { mutableStateOf<List<Department>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+    var selectedDepartment by remember { mutableStateOf<Department?>(null) }
+    var expanded by remember { mutableStateOf(false) }
 
     suspend fun getLastEmployeeId(): Int {
         return repo.getAllEmployees().maxByOrNull { it.id }?.id ?: 0
+    }
+    LaunchedEffect(Unit) {
+        departments = repo.getAllDepartments()
     }
 
     Row(
@@ -135,13 +151,40 @@ fun CreateEmployee(repo: Repository) {
                         label = { Text("Enter Employee Surname:", fontWeight = FontWeight.Bold) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { expanded = true }
+                    ) {
+                        Text(
+                            text = "Enter Department:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
+                        )
 
-                    TextField(
-                        value = employeeDepartment,
-                        onValueChange = { employeeDepartment = it },
-                        label = { Text("Enter Employee Department:", fontWeight = FontWeight.Bold) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                    )
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        departments.forEach { department ->
+                            DropdownMenuItem(text = { Text(department.name) },
+                                onClick = {
+                                    selectedDepartment = department
+                                    employeeDepartment = department.name
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -185,14 +228,15 @@ fun CreateEmployee(repo: Repository) {
                     onClick = {
                         coroutineScope.launch {
                             val lastEmployeeId = getLastEmployeeId() + 1
-                            val departmentId = repo.getDepartmentIdByName(employeeDepartment)
+                            val departmentId = selectedDepartment?.id
                             val managerId = repo.getManagerIdByDepartmentName(employeeDepartment)
                             if(departmentId != null){
                                 when (employeeType) {
                                     "Staff" -> {
                                         if(managerId != null){
                                             val employee = Staff(
-                                                lastEmployeeId, employeeName, employeeName + "@example.com",
+                                                lastEmployeeId, employeeName,
+                                                "$employeeName@gmail.com",
                                                 "password", Role.valueOf(employeeRole), 0,
                                                 StaffStatus.AVAILABLE, departmentId, managerId
                                             )
@@ -203,13 +247,15 @@ fun CreateEmployee(repo: Repository) {
                                     }
                                     "Manager" -> {
                                         val employee = Manager(
-                                            lastEmployeeId, employeeName, employeeName + "@example.com",
+                                            lastEmployeeId, employeeName,
+                                            "$employeeName@gmail.com",
                                             "password", Role.valueOf(employeeRole), 0, departmentId)
                                         repo.insertManager(employee)
                                     }
                                     "CTO" -> {
                                         val employee = CTO(
-                                            lastEmployeeId, employeeName, employeeName + "@example.com",
+                                            lastEmployeeId, employeeName,
+                                            "$employeeName@gmail.com",
                                             "password", Role.valueOf(employeeRole)
                                         )
                                         repo.insertCTO(employee)
@@ -254,6 +300,19 @@ fun RemoveEmployee(repo: Repository) {
     var employeeId by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var employeeDepartment by remember { mutableStateOf("") }
+    var employeeName by remember { mutableStateOf("") }
+    var dropdownExpanded by remember { mutableStateOf(false) }
+    var departments by remember { mutableStateOf<List<Department>>(emptyList()) }
+    var employees by remember { mutableStateOf<List<Employee>>(emptyList()) }
+    var selectedDepartment by remember { mutableStateOf<Department?>(null) }
+    var selectedEmployee by remember { mutableStateOf<Employee?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        departments = repo.getAllDepartments()
+        employees = repo.getAllEmployees()
+    }
 
     Row(
         modifier = Modifier
@@ -278,22 +337,88 @@ fun RemoveEmployee(repo: Repository) {
                     modifier = Modifier
                         .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
                 ) {
-                    TextField(
-                        value = employeeId,
-                        onValueChange = { employeeId = it },
-                        label = { Text("Enter Employee ID:", fontWeight = FontWeight.Bold) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { expanded = true }
+                    ) {
+                        Text(
+                            text = "Enter Department:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
+                        )
+
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        departments.forEach { department ->
+                            DropdownMenuItem(text = { Text(department.name) },
+                                onClick = {
+                                    selectedDepartment = department
+                                    employeeDepartment = department.name
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { dropdownExpanded = true }
+                    ) {
+                        Text(
+                            text = "Enter Employee:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeName.takeIf { it.isNotBlank() } ?: "Select Employee",
+                        )
+
+                    }
+                    DropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        employees.forEach { employee ->
+                            DropdownMenuItem(text = { Text(employee.name) },
+                                onClick = {
+                                    selectedEmployee = employee
+                                    employeeName = employee.name
+                                    dropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            repo.deleteEmployeeById(employeeId.toInt())
+                        val id = employeeId.toIntOrNull()
+                        if (id != null) {
+                            coroutineScope.launch {
+                                repo.deleteEmployeeById(id)
+                            }
+                            employeeId = ""
+                            removeEmployee = false
                         }
-                        employeeId = ""
-                        removeEmployee = false
                     },
                 ) {
                     Text("Remove")
@@ -321,6 +446,19 @@ fun ChangeEmployeeRole(repo: Repository) {
     var showDialog by remember { mutableStateOf(false) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var employeeDepartment by remember { mutableStateOf("") }
+    var employeeName by remember { mutableStateOf("") }
+    var departments by remember { mutableStateOf<List<Department>>(emptyList()) }
+    var employees by remember { mutableStateOf<List<Employee>>(emptyList()) }
+    var selectedDepartment by remember { mutableStateOf<Department?>(null) }
+    var selectedEmployee by remember { mutableStateOf<Employee?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+    var dropdownExpandedEmp by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        departments = repo.getAllDepartments()
+        employees = repo.getAllEmployees()
+    }
 
     Row(
         modifier = Modifier
@@ -350,12 +488,75 @@ fun ChangeEmployeeRole(repo: Repository) {
                     modifier = Modifier
                         .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
                 ) {
-                    TextField(
-                        value = employeeId,
-                        onValueChange = { employeeId = it },
-                        label = { Text("Enter Employee ID:", fontWeight = FontWeight.Bold) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { expanded = true }
+                    ) {
+                        Text(
+                            text = "Enter Department:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        departments.forEach { department ->
+                            DropdownMenuItem(text = { Text(department.name) },
+                                onClick = {
+                                    selectedDepartment = department
+                                    employeeDepartment = department.name
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { dropdownExpandedEmp = true }
+                    ) {
+                        Text(
+                            text = "Enter Employee:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = employeeName.takeIf { it.isNotBlank() } ?: "Select Employee",
+                        )
+
+                    }
+                    DropdownMenu(
+                        expanded = dropdownExpandedEmp,
+                        onDismissRequest = { dropdownExpandedEmp = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        employees.forEach { employee ->
+                            //filteredEmployees.forEach { employee ->
+                            DropdownMenuItem(text = { Text(employee.name) },
+                                onClick = {
+                                    selectedEmployee = employee
+                                    employeeName = employee.name
+                                    dropdownExpandedEmp = false
+                                }
+                            )
+                        }
+                    }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -501,9 +702,16 @@ fun AddDepartment(repo: Repository) {
 @Composable
 fun DeleteDepartment(repo: Repository) {
     var deleteDepartment by remember { mutableStateOf(false) }
+    var selectedDepartment by remember { mutableStateOf<Department?>(null) }
     var departmentName by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var departments by remember { mutableStateOf<List<Department>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        departments = repo.getAllDepartments()
+    }
 
     Row(
         modifier = Modifier
@@ -516,7 +724,12 @@ fun DeleteDepartment(repo: Repository) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Delete Department", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+        Text(
+            text = "Delete Department",
+            fontSize = 20.sp,
+            textAlign = TextAlign.Left,
+            fontWeight = FontWeight.Bold
+        )
     }
 
     if (deleteDepartment) {
@@ -529,23 +742,50 @@ fun DeleteDepartment(repo: Repository) {
                         .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
                         .padding(5.dp, top = 10.dp, bottom = 10.dp)
                 ) {
-                    TextField(
-                        value = departmentName,
-                        onValueChange = { departmentName = it },
-                        label = { Text("Enter Department Name:", fontWeight = FontWeight.Bold) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(end = 8.dp, start = 15.dp, bottom = 20.dp, top = 20.dp)
+                            .clickable { expanded = true }
+                    ) {
+                        Text(
+                            text = "Enter Department:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(
+                            text = departmentName.takeIf { it.isNotBlank() } ?: "Select Department",
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                    ) {
+                        departments.forEach { department ->
+                            DropdownMenuItem(text = { Text(department.name) },
+                                onClick = {
+                                    selectedDepartment = department
+                                    departmentName = department.name
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            repo.deleteDepartmentByName(departmentName)
+                            repo.deleteDepartmentById(selectedDepartment!!.id)
                         }
-                        departmentName = ""
+                        selectedDepartment = null
                         deleteDepartment = false
-                    },
+                    }
                 ) {
                     Text("Delete")
                 }
@@ -553,9 +793,9 @@ fun DeleteDepartment(repo: Repository) {
             dismissButton = {
                 Button(
                     onClick = {
-                        departmentName = ""
+                        selectedDepartment = null
                         deleteDepartment = false
-                    },
+                    }
                 ) {
                     Text("Cancel")
                 }

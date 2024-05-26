@@ -228,6 +228,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                                     status = TaskStatus.OPEN,
                                     difficulty = taskDifficulty,
                                     isHelp = HelpType.Default,
+                                    creationTime = System.currentTimeMillis(),
                                     deadline = taskDueDate,
                                     taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
                                     departmentId = selectedDepartmentId

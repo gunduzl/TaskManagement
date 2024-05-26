@@ -201,6 +201,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                             status = TaskStatus.OPEN,
                                             difficulty = taskDifficulty,
                                             isHelp = HelpType.Default,
+                                            creationTime = System.currentTimeMillis(),
                                             deadline = taskDueDate,
                                             taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
                                             departmentId = manager.departmentId

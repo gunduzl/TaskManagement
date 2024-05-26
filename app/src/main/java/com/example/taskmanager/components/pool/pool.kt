@@ -163,7 +163,7 @@ fun TaskItem(
                     Row { Text("Due Date:  ", fontWeight = FontWeight.Bold) }
                     Row { Text(task.deadline) }
                     Row { Text("Time Left: ", fontWeight = FontWeight.Bold) }
-                    Row { Text("8 days") } // This should be dynamically calculated
+                    Row { Text("30 Seconds") } // This should be dynamically calculated
                     Row { Text("Difficulty: ", fontWeight = FontWeight.Bold) }
                     Row { Text(task.difficulty.name) }
 

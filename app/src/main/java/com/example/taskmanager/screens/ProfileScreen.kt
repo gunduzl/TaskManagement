@@ -163,6 +163,6 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = employeeId)
+        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = employeeId)
     }
 }
