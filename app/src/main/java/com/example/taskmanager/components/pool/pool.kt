@@ -122,7 +122,6 @@ fun TaskItem(
                             task.status = TaskStatus.OPEN
                             refreshTasks()
                         }
-                        showButtons = false
                     }
                     ) {
                         Text("Confirm")

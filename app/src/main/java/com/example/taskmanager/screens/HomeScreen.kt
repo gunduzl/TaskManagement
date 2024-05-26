@@ -38,8 +38,8 @@ fun HomeScreen(repo: Repository, staffId: Int) {
             if(department != null){
                  depId = department.id
             }
-
             openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN,depId)
+            openTasks = openTasks.filter { task -> task.owners.none { owner -> owner.id == staffId } }
             activeTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE,depId)
         }
     }
