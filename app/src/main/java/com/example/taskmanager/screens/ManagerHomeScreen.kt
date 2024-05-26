@@ -53,14 +53,14 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val totalTask = remember { mutableStateOf(0) }
+    var totalTask = remember { mutableStateOf(0) }
 
     var openTasks by remember { mutableStateOf(emptyList<Task>()) }
     var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
 
     fun refreshTasks() {
         coroutineScope.launch {
-            val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
+            //val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
             val manager = repo.getManagerById(managerId)
             if (manager != null) {
                 openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, manager.departmentId)
@@ -194,7 +194,8 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                     val manager = repo.getManagerById(managerId)
                                     if (manager != null) {
                                         val task = Task(
-                                            id = totalTask.value + 1, // Replace with your task ID generation logic
+                                            //id = totalTask.value + 1, // Replace with your task ID generation logic
+                                            id = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size + 1,
                                             title = taskName,
                                             description = taskDescription,
                                             status = TaskStatus.OPEN,

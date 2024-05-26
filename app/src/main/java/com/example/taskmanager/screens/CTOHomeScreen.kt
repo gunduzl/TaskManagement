@@ -40,17 +40,26 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    var department1Tasks by remember { mutableStateOf(emptyList<Task>()) }
-    var department2Tasks by remember { mutableStateOf(emptyList<Task>()) }
-    var department3Tasks by remember { mutableStateOf(emptyList<Task>()) }
+    var department1OpenTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var department2OpenTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var department3OpenTasks by remember { mutableStateOf(emptyList<Task>()) }
+
+    var department1ActiveTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var department2ActiveTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var department3ActiveTasks by remember { mutableStateOf(emptyList<Task>()) }
 
     fun refreshTasks() {
         coroutineScope.launch {
-            department1Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 1)
-            department2Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 2)
-            department3Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 3)
+            department1OpenTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 1)
+            department2OpenTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 2)
+            department3OpenTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 3)
+
+        department1ActiveTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE, 1)
+            department2ActiveTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE, 2)
+            department3ActiveTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE, 3)
         }
     }
+
 
     LaunchedEffect(Unit) {
         refreshTasks()
@@ -225,29 +234,17 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     ) {
         TeamNavigationBar(selectedTeam, setSelectedTeam)
         when (selectedTeam) {
-            CTODepartment.DEPARTMENT_1 -> Department_1(department1Tasks, repo, ::refreshTasks)
-            CTODepartment.DEPARTMENT_2 -> Department_2(department2Tasks, repo, ::refreshTasks)
-            CTODepartment.DEPARTMENT_3 -> Department_3(department3Tasks, repo, ::refreshTasks)
+            CTODepartment.DEPARTMENT_1 -> DepartmentPools(department1OpenTasks, department1ActiveTasks, repo, ::refreshTasks)
+            CTODepartment.DEPARTMENT_2 -> DepartmentPools(department2OpenTasks, department2ActiveTasks, repo, ::refreshTasks)
+            CTODepartment.DEPARTMENT_3 -> DepartmentPools(department3OpenTasks, department3ActiveTasks, repo, ::refreshTasks)
         }
     }
 }
 
 @Composable
-fun Department_1(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
-}
-
-@Composable
-fun Department_2(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
-}
-
-@Composable
-fun Department_3(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
+fun DepartmentPools(openTasks: List<Task>,activeTasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
+    Pool(0, "Open", Color(0x666650a4), openTasks, false, repo, refreshTasks)
+    Pool(0, "Active", Color(0x666790a4), activeTasks, false, repo, refreshTasks)
 }
 
 @Composable

@@ -70,6 +70,8 @@ class Repository {
         )
     }
 
+
+
     suspend fun getEmployeeByEmailAndPassword(email: String, password: String): Employee? = mutex.withLock {
         return employeeList.find { it.email == email && it.password == password }
     }
@@ -224,6 +226,7 @@ class Repository {
         employeeList.replaceAll { if (it.id == staff.id) staff else it }
     }
 
+    // Bu bozuk
     suspend fun updateTaskStatus(taskId: Int, newStatus: TaskStatus) = mutex.withLock {
         val taskIndex = taskList.indexOfFirst { it.id == taskId }
         if (taskIndex != -1) {
