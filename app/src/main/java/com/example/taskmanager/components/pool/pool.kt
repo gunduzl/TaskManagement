@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.HelpType
-import com.example.taskmanager.profileComponents.out.Notification
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.profileComponents.out.Task
@@ -122,8 +121,8 @@ fun TaskItem(
                             task.isHelp = HelpType.Confirmed
                             task.status = TaskStatus.OPEN
                             refreshTasks()
+                            repo.sendHelpConfirmNotification(task)
                         }
-                        showButtons = false
                     }
                     ) {
                         Text("Confirm")
@@ -134,8 +133,10 @@ fun TaskItem(
                             coroutineScope.launch {
                                 task.isHelp = HelpType.Rejected
                                 refreshTasks()
+                                repo.sendHelpRejectNotification(task)
                             }
                             showButtons = false
+                            task.isHelp = HelpType.Rejected
                         }
                     ) {
                         Text("Reject")
@@ -144,7 +145,6 @@ fun TaskItem(
             }
         }
     }
-
 
     if (showDialog) {
         AlertDialog(

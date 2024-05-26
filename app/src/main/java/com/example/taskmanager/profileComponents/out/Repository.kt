@@ -214,6 +214,40 @@ class Repository {
         }
     }
 
+    suspend fun sendHelpConfirmNotification(task: Task) {
+        val relatedStaff = task.owners
+        relatedStaff.forEach { staff ->
+            val notification = Notification(
+                id = generateNotificationId(),
+                title = "Help Request Response",
+                description = "The help request for task '${task.title}' has been confirmed.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.STAFF,
+                employeeId = staff.id
+            )
+            runBlocking {
+                insertNotification(notification)
+            }
+        }
+    }
+
+    suspend fun sendHelpRejectNotification(task: Task) {
+        val relatedStaff = task.owners
+        relatedStaff.forEach { staff ->
+            val notification = Notification(
+                id = generateNotificationId(),
+                title = "Help Request Response",
+                description = "The help request for task '${task.title}' has been rejected.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.STAFF,
+                employeeId = staff.id
+            )
+            runBlocking {
+                insertNotification(notification)
+            }
+        }
+    }
+
     private fun generateNotificationId(): Int {
         return (notificationList.maxOfOrNull { it.id } ?: 0) + 1
     }
