@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.HelpType
+import com.example.taskmanager.profileComponents.out.Notification
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.profileComponents.out.Task

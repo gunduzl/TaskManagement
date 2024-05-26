@@ -1,5 +1,6 @@
 package com.example.taskmanager.profileComponents.out
 
+import android.util.Log
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -128,6 +129,10 @@ class Repository {
         return employeeList.filterIsInstance<Manager>().find { it.id == managerId }
     }
 
+    suspend fun getManagerByDepartmentId(departmentId: Int): Manager? = mutex.withLock {
+        return employeeList.filterIsInstance<Manager>().find { it.departmentId == departmentId }
+    }
+
     suspend fun getDepartmentById(departmentId: Int): Department? = mutex.withLock {
         return departmentList.find { it.id == departmentId }
     }
@@ -191,6 +196,21 @@ class Repository {
             runBlocking {
                 insertNotification(notification)
             }
+        }
+    }
+
+    suspend fun sendHelpRequestNotification(task: Task) {
+        val manager = getManagerByDepartmentId(task.departmentId)
+        val notification = Notification(
+            id = generateNotificationId(),
+            title = "Help Request Confirmation",
+            description = "Confirm or reject '${task.title}' help request.",
+            date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+            employeeType = Role.MANAGER,
+            employeeId = manager?.id ?: 0
+        )
+        runBlocking {
+            insertNotification(notification)
         }
     }
 
@@ -353,7 +373,7 @@ class Repository {
         return notificationList.filter { it.employeeId == employeeId }
     }
 
-    suspend fun insertNotification(notification: Notification) {
+    private suspend fun insertNotification(notification: Notification) {
         mutex.withLock {
             notificationList.add(notification)
         }

@@ -77,7 +77,7 @@ fun MyTasks(repo: Repository, staffId: Int) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(tasks.value) { taskWithStaff ->
-                        TaskItem(taskWithStaff.task, taskWithStaff.staff.map { it.name })
+                        TaskItem(repo, taskWithStaff.task, taskWithStaff.staff.map { it.name })
                     }
                 }
             }
@@ -86,7 +86,7 @@ fun MyTasks(repo: Repository, staffId: Int) {
 }
 
 @Composable
-fun TaskItem(task: Task, staffNames: List<String>) {
+fun TaskItem(repo: Repository, task: Task, staffNames: List<String>) {
     val statusColor = when (task.status) {
         TaskStatus.CLOSED -> customGreen
         TaskStatus.ACTIVE -> customPurple
@@ -163,6 +163,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
                             coroutineScope.launch {
                                 task.isHelp = HelpType.Requested
                                 showDialog.value = false
+                                repo.sendHelpRequestNotification(task)
                             }
 
                         }
