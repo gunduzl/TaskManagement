@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,13 +24,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.components.Leaderboard
-import com.example.taskmanager.components.Staff
 import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Staff
+import com.example.taskmanager.profileComponents.out.TaskWithStaff
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
+    var yourLeaderboardList= remember { mutableStateOf<List<Staff>>(emptyList()) }
+
+    suspend fun refreshLeaderboardScreen(){
+         yourLeaderboardList.value = repo.getStaffList()
+    }
+
+    suspend fun refreshPagePeriodically() {
+        while (true) {
+            refreshLeaderboardScreen()
+            delay(30000)
+        }
+    }
+    LaunchedEffect(employeeId) {
+        refreshPagePeriodically()
+
+    }
+
 
     Column(
         modifier = Modifier
@@ -57,6 +77,7 @@ fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
             NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = employeeId)
         } else {
 
+            /*
             val yourLeaderboardList: List<Staff> = listOf(
                 Staff(name = "John Doe", score = 75),
                 Staff(name = "Jane Smith", score = 90),
@@ -64,8 +85,10 @@ fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
                 Staff(name = "Bob Brown", score = 80)
                 // Diğer girişler buraya eklenebilir
             )
+            */
 
-            Leaderboard(yourLeaderboardList)
+
+            Leaderboard(yourLeaderboardList.value)
 
         }
 

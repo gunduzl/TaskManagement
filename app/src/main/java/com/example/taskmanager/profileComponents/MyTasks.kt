@@ -40,9 +40,11 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.profileComponents.out.TaskWithStaff
+import com.example.taskmanager.systems.EvaluationSystem
 import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun MyTasks(repo: Repository, staffId: Int) {
@@ -102,6 +104,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
     val showDialog = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,13 +136,43 @@ fun TaskItem(task: Task, staffNames: List<String>) {
             )
         } else {
             if (staffNames.isNotEmpty()) {
-                Text(
-                    text = "Assigned to ${staffNames.joinToString()}",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 10.dp, end = 8.dp)
-                )
+                Row {
+                    /*
+                    Text(
+                        text = "Assigned to ${staffNames.joinToString()}",
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp, end = 8.dp)
+                    )
+                    */
+
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                task.status = TaskStatus.CLOSED
+                                val staffs = task.owners
+                                val managerId = staffs[0].departmentManagerId
+                                for (staff in staffs) {
+                                    EvaluationSystem().evaluatePointFromTask(staff, task)
+
+                                }
+                                val manager = Repository().getManagerById(managerId)
+                                if(manager != null){
+                                    EvaluationSystem().evaluateManagerPoint(manager)
+                                }
+
+                                showDialog.value= true
+                            }
+                        },
+                    ) {
+                        Text("Submit")
+                    }
+
+                }
+
+
             }
         }
+
     }
 
     // Alert Dialog

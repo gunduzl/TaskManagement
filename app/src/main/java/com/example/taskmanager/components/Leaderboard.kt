@@ -22,12 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.profileComponents.out.Staff
 
-data class Staff(val name: String, val score: Int)
+//data class Staff(val name: String, val score: Int)
 
 @Composable
 fun Leaderboard(leaderboard: List<Staff>) {
-    val sortedLeaderboard = leaderboard.sortedByDescending { it.score }
+    val sortedLeaderboard = leaderboard.sortedByDescending { it.staffPoint }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -41,9 +42,20 @@ fun Leaderboard(leaderboard: List<Staff>) {
 }
 @Composable
 fun LeaderboardContent(sortedLeaderboard: List<Staff>) {
+    /*
     sortedLeaderboard.forEachIndexed { index, staff ->
-        LeaderboardEntry(index + 1, staff.name, staff.score)
+        LeaderboardEntry(index + 1, staff.name, staff.staffPoint)
         Spacer(modifier = Modifier.height(10.dp))
+    }
+    */
+    var index = 0
+    for(staff in sortedLeaderboard){
+        if(index < 5){
+            LeaderboardEntry(index + 1, staff.name, staff.staffPoint)
+            Spacer(modifier = Modifier.height(10.dp))
+            index++
+        }
+
     }
 }
 @Composable

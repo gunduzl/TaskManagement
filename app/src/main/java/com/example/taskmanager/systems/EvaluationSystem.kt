@@ -30,8 +30,8 @@ class EvaluationSystem {
 
     // Time'a gÃ¶re updatelenecek
     fun evaluatePointFromTask(staff: Staff,task: Task) {
-
         staff.pointsList.add(task.taskPoint)
+        staff.staffPoint += task.taskPoint
     }
 
 

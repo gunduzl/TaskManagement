@@ -81,6 +81,9 @@ class Repository {
         return employeeList.filterIsInstance<Staff>().find { it.id == staffId }
     }
 
+    fun getStaffList(): List<Staff> {
+        return employeeList.filterIsInstance<Staff>()
+    }
     suspend fun insertStaff(staff: Staff) = mutex.withLock {
         employeeList.add(staff)
     }
