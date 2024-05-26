@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,8 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.HelpType
 import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import kotlinx.coroutines.launch
@@ -87,8 +90,14 @@ fun TaskItem(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var showButtons by remember { mutableStateOf(true) }
+    var employee by remember { mutableStateOf<Employee?>(null) }
+    var employeeRole by remember { mutableStateOf<Role?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(employeeId) {
+        employee = repo.getEmployeeById(employeeId)
+        employeeRole = employee?.role
+    }
 
 
     Row(
@@ -105,7 +114,7 @@ fun TaskItem(
         Column {
             Text(text = task.title, fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing between buttons
-            if(task.isHelp == HelpType.Requested && showButtons){
+            if(task.isHelp == HelpType.Requested && employeeRole == Role.MANAGER && showButtons){
                 Row {
                     Button(onClick = {
                         coroutineScope.launch {

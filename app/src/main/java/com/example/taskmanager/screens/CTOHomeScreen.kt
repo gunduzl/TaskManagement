@@ -2,34 +2,13 @@ package com.example.taskmanager.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,11 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.components.pool.Pool
-import com.example.taskmanager.profileComponents.out.HelpType
-import com.example.taskmanager.profileComponents.out.Repository
-import com.example.taskmanager.profileComponents.out.Task
-import com.example.taskmanager.profileComponents.out.TaskDifficulty
-import com.example.taskmanager.profileComponents.out.TaskStatus
+import com.example.taskmanager.profileComponents.out.*
 import com.example.taskmanager.systems.EvaluationSystem
 import kotlinx.coroutines.launch
 
@@ -54,10 +29,12 @@ enum class CTODepartment {
 @Composable
 fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     var showAddDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDueDate by remember { mutableStateOf("") }
-    var taskDifficulty by remember {  mutableStateOf(TaskDifficulty.LOW) }
+    var taskDifficulty by remember { mutableStateOf(TaskDifficulty.LOW) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(CTODepartment.DEPARTMENT_1) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
@@ -88,6 +65,16 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
         Button(onClick = { setShowNotification(true) }) {
             Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
         }
+        Spacer(modifier = Modifier.width(50.dp))
+        Button(onClick = {
+            showAddDialog = true
+            taskName = ""
+            taskDescription = ""
+            taskDueDate = ""
+            dropdownExpanded = false
+        }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null)
+        }
     }
 
     if (showAddDialog) {
@@ -99,7 +86,6 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                 taskDueDate = ""
                 taskDifficulty = TaskDifficulty.LOW
                 dropdownExpanded = false
-
             },
             title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
             text = {
@@ -165,32 +151,34 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             confirmButton = {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            val cto = repo.getCTOById(ctoId)
-                            if(cto != null){
-                                val task = Task(
-                                    id = 0, // Replace with your task ID generation logic
-                                    title = taskName,
-                                    description = taskDescription,
-                                    status = TaskStatus.OPEN,
-                                    difficulty = taskDifficulty,
-                                    isHelp = HelpType.Default,
-                                    deadline = taskDueDate,
-                                    taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
-                                    departmentId = when (selectedTeam) {
-                                        CTODepartment.DEPARTMENT_1 -> 1
-                                        CTODepartment.DEPARTMENT_2 -> 2
-                                        CTODepartment.DEPARTMENT_3 -> 3
-                                    }
-                                )
-                                repo.insertTask(task)
-                                refreshTasks()
-
+                        if (taskName.isEmpty() || taskDescription.isEmpty() || taskDueDate.isEmpty()) {
+                            errorMessage = "Please fill in all fields."
+                            showErrorDialog = true
+                        } else {
+                            coroutineScope.launch {
+                                val cto = repo.getCTOById(ctoId)
+                                if (cto != null) {
+                                    val task = Task(
+                                        id = 0, // Replace with your task ID generation logic
+                                        title = taskName,
+                                        description = taskDescription,
+                                        status = TaskStatus.OPEN,
+                                        difficulty = taskDifficulty,
+                                        isHelp = HelpType.Default,
+                                        deadline = taskDueDate,
+                                        taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
+                                        departmentId = when (selectedTeam) {
+                                            CTODepartment.DEPARTMENT_1 -> 1
+                                            CTODepartment.DEPARTMENT_2 -> 2
+                                            CTODepartment.DEPARTMENT_3 -> 3
+                                        }
+                                    )
+                                    repo.insertTask(task)
+                                    refreshTasks()
+                                }
                             }
-
+                            showAddDialog = false
                         }
-                        showAddDialog = false
-
                     },
                 ) {
                     Text("Add")
@@ -213,8 +201,21 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
         )
     }
 
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { Text("Error", fontWeight = FontWeight.Bold) },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = ctoId)
+        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = ctoId)
     }
 
     Column(
@@ -222,9 +223,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             .fillMaxSize()
             .padding(start = 10.dp, end = 10.dp, top = 65.dp)
     ) {
-        // Navigation bar
         TeamNavigationBar(selectedTeam, setSelectedTeam)
-        // Display team details based on the selected team
         when (selectedTeam) {
             CTODepartment.DEPARTMENT_1 -> Department_1(department1Tasks, repo, ::refreshTasks)
             CTODepartment.DEPARTMENT_2 -> Department_2(department2Tasks, repo, ::refreshTasks)
@@ -258,7 +257,6 @@ fun TeamNavigationBar(selectedTeam: CTODepartment, onTeamSelected: (CTODepartmen
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Navigation buttons for each team
         TeamNavigationButton(
             team = CTODepartment.DEPARTMENT_1,
             isSelected = selectedTeam == CTODepartment.DEPARTMENT_1,
@@ -294,7 +292,6 @@ fun TeamNavigationButton(
                 contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             )
         ) {
-            // Display team name as button text
             Text(
                 text = when (team) {
                     CTODepartment.DEPARTMENT_1 -> "Depr 1"

@@ -40,7 +40,8 @@ class Repository {
                 Manager(7, "Gunduz", "gunduz@gmail.com", "password", Role.MANAGER, 5, 1),
                 Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 6, 2),
                 Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 7, 3),
-                CTO(10, "Elif", "cto@example.com", "password", Role.CTO)
+                CTO(10, "Elif", "cto@example.com", "password", Role.CTO),
+                Admin(11,"Oguzhan","admin@gmail.com","password",Role.ADMIN)
             )
         )
 
