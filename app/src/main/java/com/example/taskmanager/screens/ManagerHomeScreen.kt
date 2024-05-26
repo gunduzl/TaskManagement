@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     var showAddDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDueDate by remember { mutableStateOf("") }
@@ -52,16 +53,14 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val totalTask = remember { mutableStateOf(0) }
+    var totalTask = remember { mutableStateOf(0) }
 
     var openTasks by remember { mutableStateOf(emptyList<Task>()) }
     var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
 
-
-
     fun refreshTasks() {
         coroutineScope.launch {
-            val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
+            //val totalTask = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size
             val manager = repo.getManagerById(managerId)
             if (manager != null) {
                 openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, manager.departmentId)
@@ -70,25 +69,13 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
         }
     }
 
-    /*
-    fun addTaskToPool(taskName: String,taskDescription: String, taskDifficulty: TaskDifficulty ){
-        coroutineScope.launch {
-            val manager = repo.getManagerById(managerId)
-            if(manager != null){
-               val task = Task(10, taskName, taskDescription, TaskStatus.OPEN, taskDifficulty, HelpType.Default, taskDueDate, manager.departmentId)
-                repo.insertTask(task)
-            }
-        }
-
-    }*/
-
     LaunchedEffect(managerId) {
         refreshTasks()
     }
 
     Column(
         modifier = Modifier
-            .fillMaxWidth(1f)
+            .fillMaxWidth()
             .padding(top = 10.dp, start = 20.dp, end = 10.dp)
     ) {
         Row(
@@ -195,34 +182,35 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                 dropdownExpanded = false
                             })
                         }
-
                     }
-
                 },
                 confirmButton = {
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                val manager = repo.getManagerById(managerId)
-                                if (manager != null) {
-                                    val task = Task(
-                                        id = totalTask.value +1 , // Replace with your task ID generation logic
-                                        title = taskName,
-                                        description = taskDescription,
-                                        status = TaskStatus.OPEN,
-                                        difficulty = taskDifficulty,
-                                        isHelp = HelpType.Default,
-                                        deadline = taskDueDate,
-                                        taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
-                                        departmentId = manager.departmentId
-                                    )
-                                    repo.insertTask(task)
-                                    refreshTasks()
+                            if (taskName.isBlank() || taskDescription.isBlank() || taskDueDate.isBlank()) {
+                                showErrorDialog = true
+                            } else {
+                                coroutineScope.launch {
+                                    val manager = repo.getManagerById(managerId)
+                                    if (manager != null) {
+                                        val task = Task(
+                                            //id = totalTask.value + 1, // Replace with your task ID generation logic
+                                            id = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size + 1,
+                                            title = taskName,
+                                            description = taskDescription,
+                                            status = TaskStatus.OPEN,
+                                            difficulty = taskDifficulty,
+                                            isHelp = HelpType.Default,
+                                            deadline = taskDueDate,
+                                            taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
+                                            departmentId = manager.departmentId
+                                        )
+                                        repo.insertTask(task)
+                                        refreshTasks()
+                                    }
                                 }
+                                showAddDialog = false
                             }
-                            showAddDialog = false
-
-
                         }
                     ) {
                         Text("Add")
@@ -243,9 +231,24 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                 }
             )
         }
+
+        if (showErrorDialog) {
+            AlertDialog(
+                onDismissRequest = { showErrorDialog = false },
+                title = { Text("Error", fontWeight = FontWeight.Bold) },
+                text = { Text("Please fill out all fields before adding the task.") },
+                confirmButton = {
+                    Button(
+                        onClick = { showErrorDialog = false }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = managerId)
+        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = managerId)
     }
 }
