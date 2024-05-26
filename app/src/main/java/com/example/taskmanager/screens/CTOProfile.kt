@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
@@ -49,7 +50,7 @@ import com.example.taskmanager.ui.theme.customPurple
 import kotlinx.coroutines.launch
 
 @Composable
-fun CTOProfile(repo: Repository, ctoId: Int) {
+fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     val (selectedDepartmentId, setSelectedDepartmentId) = remember { mutableStateOf<Int?>(null) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val ctoName = remember { mutableStateOf("Loading...") }
@@ -72,7 +73,10 @@ fun CTOProfile(repo: Repository, ctoId: Int) {
 
     Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
         Button(onClick = {
-            // Add your logout logic here
+            // Navigate back to the login screen
+            navController.navigate("/first_screen") {
+                popUpTo("/app-navigation") { inclusive = true }
+            }
         }) {
             Text("Logout")
         }
