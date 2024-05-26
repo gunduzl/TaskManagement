@@ -338,6 +338,10 @@ class Repository {
             notificationList.add(notification)
         }
     }
+
+    suspend fun getTaskListSize(): Int = mutex.withLock {
+        return taskList.size
+    }
 }
 
 

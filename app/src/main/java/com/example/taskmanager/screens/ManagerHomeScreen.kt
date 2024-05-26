@@ -195,7 +195,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                     if (manager != null) {
                                         val task = Task(
                                             //id = totalTask.value + 1, // Replace with your task ID generation logic
-                                            id = repo.getTasksByStatus(TaskStatus.OPEN).size + repo.getTasksByStatus(TaskStatus.ACTIVE).size + 1,
+                                            id = repo.getTaskListSize()+1,
                                             title = taskName,
                                             description = taskDescription,
                                             status = TaskStatus.OPEN,
