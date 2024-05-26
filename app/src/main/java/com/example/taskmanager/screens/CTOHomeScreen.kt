@@ -5,12 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -19,7 +23,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -37,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.components.pool.Pool
+import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.HelpType
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Task
@@ -45,48 +49,94 @@ import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.systems.EvaluationSystem
 import kotlinx.coroutines.launch
 
-enum class CTODepartment {
-    DEPARTMENT_1,
-    DEPARTMENT_2,
-    DEPARTMENT_3
-}
-
 @Composable
 fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     var showAddDialog by remember { mutableStateOf(false) }
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDueDate by remember { mutableStateOf("") }
-    var taskDifficulty by remember {  mutableStateOf(TaskDifficulty.LOW) }
+    var taskDifficulty by remember { mutableStateOf(TaskDifficulty.LOW) }
     var dropdownExpanded by remember { mutableStateOf(false) }
-    val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(CTODepartment.DEPARTMENT_1) }
+    val (selectedDepartmentId, setSelectedDepartmentId) = remember { mutableStateOf<Int?>(null) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var departments by remember { mutableStateOf(emptyList<Department>()) }
+    var openTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
 
-    var department1Tasks by remember { mutableStateOf(emptyList<Task>()) }
-    var department2Tasks by remember { mutableStateOf(emptyList<Task>()) }
-    var department3Tasks by remember { mutableStateOf(emptyList<Task>()) }
-
-    fun refreshTasks() {
+    fun refreshTasks(departmentId: Int) {
         coroutineScope.launch {
-            department1Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 1)
-            department2Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 2)
-            department3Tasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, 3)
+            openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN, departmentId)
+            activeTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE, departmentId)
         }
     }
 
-    LaunchedEffect(Unit) {
-        refreshTasks()
+    LaunchedEffect(ctoId) {
+        coroutineScope.launch {
+            val ctoWithDepartments = repo.getCTOWithDepartments(ctoId)
+            if (ctoWithDepartments.isNotEmpty()) {
+                departments = ctoWithDepartments.first().departments
+                if (departments.isNotEmpty()) {
+                    setSelectedDepartmentId(departments.first().id)
+                }
+            }
+        }
     }
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+    LaunchedEffect(selectedDepartmentId) {
+        selectedDepartmentId?.let {
+            refreshTasks(it)
+        }
+    }
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 10.dp)
+            .padding(16.dp)
     ) {
-        Button(onClick = { setShowNotification(true) }) {
-            Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                onClick = { setShowNotification(true) },
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
+            }
+            Button(
+                onClick = { showAddDialog = true },
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "My Departments",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Department Navigation Bar
+        DepartmentNavigationBar(departments, selectedDepartmentId, setSelectedDepartmentId)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Pools for open and active tasks
+        selectedDepartmentId?.let { departmentId ->
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Pool(ctoId, "Open", Color(0x666650a4), openTasks, false, repo) { refreshTasks(departmentId) }
+                Pool(ctoId, "Active", Color(0x666790a4), activeTasks, false, repo) { refreshTasks(departmentId) }
+            }
         }
     }
 
@@ -99,13 +149,13 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                 taskDueDate = ""
                 taskDifficulty = TaskDifficulty.LOW
                 dropdownExpanded = false
-
             },
             title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
             text = {
                 Column(
                     modifier = Modifier
                         .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .padding(16.dp)
                 ) {
                     TextField(
                         value = taskName,
@@ -113,6 +163,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                         label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     TextField(
                         value = taskDescription,
                         onValueChange = { taskDescription = it },
@@ -120,12 +171,14 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                         modifier = Modifier.height(100.dp)
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     TextField(
                         value = taskDueDate,
                         onValueChange = { taskDueDate = it },
                         label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -167,7 +220,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                     onClick = {
                         coroutineScope.launch {
                             val cto = repo.getCTOById(ctoId)
-                            if(cto != null){
+                            if (cto != null && selectedDepartmentId != null) {
                                 val task = Task(
                                     id = 0, // Replace with your task ID generation logic
                                     title = taskName,
@@ -177,20 +230,13 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                                     isHelp = HelpType.Default,
                                     deadline = taskDueDate,
                                     taskPoint = EvaluationSystem().evaluateTaskPoint(taskDifficulty),
-                                    departmentId = when (selectedTeam) {
-                                        CTODepartment.DEPARTMENT_1 -> 1
-                                        CTODepartment.DEPARTMENT_2 -> 2
-                                        CTODepartment.DEPARTMENT_3 -> 3
-                                    }
+                                    departmentId = selectedDepartmentId
                                 )
                                 repo.insertTask(task)
-                                refreshTasks()
-
+                                refreshTasks(selectedDepartmentId)
                             }
-
                         }
                         showAddDialog = false
-
                     },
                 ) {
                     Text("Add")
@@ -214,94 +260,49 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) },repo = repo, employeeId = ctoId)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 10.dp, end = 10.dp, top = 65.dp)
-    ) {
-        // Navigation bar
-        TeamNavigationBar(selectedTeam, setSelectedTeam)
-        // Display team details based on the selected team
-        when (selectedTeam) {
-            CTODepartment.DEPARTMENT_1 -> Department_1(department1Tasks, repo, ::refreshTasks)
-            CTODepartment.DEPARTMENT_2 -> Department_2(department2Tasks, repo, ::refreshTasks)
-            CTODepartment.DEPARTMENT_3 -> Department_3(department3Tasks, repo, ::refreshTasks)
-        }
+        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = ctoId)
     }
 }
 
 @Composable
-fun Department_1(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
-}
-
-@Composable
-fun Department_2(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
-}
-
-@Composable
-fun Department_3(tasks: List<Task>, repo: Repository, refreshTasks: () -> Unit) {
-    Pool(0, "Open", Color(0x666650a4), tasks, false, repo, refreshTasks)
-    Pool(0, "Active", Color(0x666790a4), tasks, false, repo, refreshTasks)
-}
-
-@Composable
-fun TeamNavigationBar(selectedTeam: CTODepartment, onTeamSelected: (CTODepartment) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Navigation buttons for each team
-        TeamNavigationButton(
-            team = CTODepartment.DEPARTMENT_1,
-            isSelected = selectedTeam == CTODepartment.DEPARTMENT_1,
-            onTeamSelected = onTeamSelected
-        )
-        TeamNavigationButton(
-            team = CTODepartment.DEPARTMENT_2,
-            isSelected = selectedTeam == CTODepartment.DEPARTMENT_2,
-            onTeamSelected = onTeamSelected
-        )
-        TeamNavigationButton(
-            team = CTODepartment.DEPARTMENT_3,
-            isSelected = selectedTeam == CTODepartment.DEPARTMENT_3,
-            onTeamSelected = onTeamSelected
-        )
-    }
-}
-
-@Composable
-fun TeamNavigationButton(
-    team: CTODepartment,
-    isSelected: Boolean,
-    onTeamSelected: (CTODepartment) -> Unit
+fun DepartmentNavigationBar(
+    departments: List<Department>,
+    selectedDepartmentId: Int?,
+    onDepartmentSelected: (Int) -> Unit
 ) {
-    Surface(
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        shape = MaterialTheme.shapes.medium
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(
-            onClick = { onTeamSelected(team) },
-            modifier = Modifier.padding(top = 15.dp, start = 5.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-            )
-        ) {
-            // Display team name as button text
-            Text(
-                text = when (team) {
-                    CTODepartment.DEPARTMENT_1 -> "Depr 1"
-                    CTODepartment.DEPARTMENT_2 -> "Depr 2"
-                    CTODepartment.DEPARTMENT_3 -> "Depr 3"
-                }
+        items(departments) { department ->
+            DepartmentNavigationButton(
+                department = department,
+                isSelected = selectedDepartmentId == department.id,
+                onDepartmentSelected = onDepartmentSelected
             )
         }
+    }
+}
+
+@Composable
+fun DepartmentNavigationButton(
+    department: Department,
+    isSelected: Boolean,
+    onDepartmentSelected: (Int) -> Unit
+) {
+    Button(
+        onClick = {
+            onDepartmentSelected(department.id)
+        },
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+        ),
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Text(text = department.name)
     }
 }
