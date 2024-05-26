@@ -87,7 +87,7 @@ fun AppNavigation(navControl: NavController, userRole: String, employeeId: Int, 
                 when (userRole) {
                     "staff" -> ProfileScreen(repo, employeeId, navControl)
                     "manager" -> ProfileScreen(repo, employeeId, navControl)
-                    "cto" -> CTOProfile(repo, employeeId)
+                    "cto" -> CTOProfile(repo, employeeId, navControl)
                     "admin" -> SystemAdministratorScreen(repo, employeeId)
                 }
             }

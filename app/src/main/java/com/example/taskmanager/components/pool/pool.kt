@@ -176,7 +176,8 @@ fun TaskItem(
                         onClick = {
                             coroutineScope.launch {
                                 repo.takeTask(employeeId, task.id) // First take the task
-                                repo.updateTaskStatus(task.id, TaskStatus.ACTIVE) // Then update the status
+                                //repo.updateTaskStatus(task.id, TaskStatus.ACTIVE) // Then update the status
+                                task.status = TaskStatus.ACTIVE
                                 refreshTasks()
                                 showDialog = false
                             }

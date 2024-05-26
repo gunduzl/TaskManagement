@@ -33,8 +33,14 @@ fun HomeScreen(repo: Repository, staffId: Int) {
 
     fun refreshTasks() {
         coroutineScope.launch {
-            openTasks = repo.getTasksByStatus(TaskStatus.OPEN)
-            activeTasks = repo.getTasksByStatus(TaskStatus.ACTIVE)
+            val department = repo.getDepartmentsFromEmployeeID(staffId)
+            var depId = 0
+            if(department != null){
+                 depId = department.id
+            }
+
+            openTasks = repo.getTasksByStatusAndDepartment(TaskStatus.OPEN,depId)
+            activeTasks = repo.getTasksByStatusAndDepartment(TaskStatus.ACTIVE,depId)
         }
     }
 

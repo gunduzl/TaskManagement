@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
@@ -58,7 +59,7 @@ enum class Team {
 }
 
 @Composable
-fun CTOProfile(repo: Repository, ctoId: Int) {
+fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     val (selectedTeam, setSelectedTeam) = remember { mutableStateOf(Team.TEAM_A) }
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val ctoName = remember { mutableStateOf("Loading...") }
@@ -79,6 +80,9 @@ fun CTOProfile(repo: Repository, ctoId: Int) {
     Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
         Button(onClick = {
             // Add your logout logic here
+            navController.navigate("/first_screen") {
+                popUpTo("/app-navigation") { inclusive = true }
+            }
         }) {
             Text("Logout")
         }
