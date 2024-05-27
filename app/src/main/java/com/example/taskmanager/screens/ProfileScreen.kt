@@ -47,7 +47,6 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.lightpurple
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 @Composable

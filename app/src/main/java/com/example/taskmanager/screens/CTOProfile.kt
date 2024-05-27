@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,8 +46,9 @@ import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.StaffStatus
-import com.example.taskmanager.ui.theme.customGreen
-import com.example.taskmanager.ui.theme.customPurple
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,13 +74,15 @@ fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     }
 
     Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
-        Button(onClick = {
+        Button(colors = ButtonDefaults.buttonColors(
+            containerColor = darkBackground
+        ),onClick = {
             // Navigate back to the login screen
             navController.navigate("/first_screen") {
                 popUpTo("/app-navigation") { inclusive = true }
             }
         }) {
-            Text("Logout")
+            Text("Logout",color= lightgray)
         }
     }
 
@@ -109,7 +113,10 @@ fun CTOProfileHeader(ctoName: String, setShowNotification: (Boolean) -> Unit) {
     ) {
         LazyColumn {
             item {
-                Button(onClick = { setShowNotification(true) }) {
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = darkBackground
+                ),
+                    onClick = { setShowNotification(true) }) {
                     Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                 }
             }
@@ -122,12 +129,12 @@ fun CTOProfileHeader(ctoName: String, setShowNotification: (Boolean) -> Unit) {
                         Text(
                             text = ctoName,
                             style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary
+                            color = darkBackground
                         )
                         Text(
                             text = "CTO",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = darkBackground
                         )
                     }
                 }
@@ -163,14 +170,17 @@ fun MyTeam(repo: Repository, departmentId: Int) {
         Column(
             modifier = Modifier
                 .padding(20.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(lightpurple,shape = RoundedCornerShape(20.dp)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "My Team",
+                text = "My Team" ,color= darkBackground,
                 fontSize = 25.sp,
+                fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 10.dp)
+
             )
             Spacer(modifier = Modifier.height(10.dp)) // Add spacer to create space before LazyColumn
             Box(
@@ -194,7 +204,7 @@ fun MyTeam(repo: Repository, departmentId: Int) {
 
 @Composable
 fun StaffItem(staff: Staff) {
-    val statusColor = if (staff.staffStatus == StaffStatus.BUSY) customPurple else customGreen
+    val statusColor = if (staff.staffStatus == StaffStatus.BUSY) darkBackground else Color.White
 
     val showDialog = remember { mutableStateOf(false) }
 
@@ -216,13 +226,13 @@ fun StaffItem(staff: Staff) {
             Text(
                 text = "Available",
                 fontStyle = FontStyle.Italic,
-                color = Color.Green
+                color = darkBackground
             )
         } else {
             Text(
                 text = "Busy",
                 fontStyle = FontStyle.Italic,
-                color = Color.Red
+                color = lightpurple
             )
         }
     }
@@ -230,20 +240,23 @@ fun StaffItem(staff: Staff) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Staff Details", fontWeight = FontWeight.Bold) },
+            title = { Text("Staff Details", fontWeight = FontWeight.Bold,color= lightgray,fontStyle = FontStyle.Italic) },
             text = {
                 Column {
-                    Text(text = "Name: ${staff.name}")
-                    Text(text = "Email: ${staff.email}")
-                    Text(text = "Department ID: ${staff.departmentId}")
-                    Text(text = "Status: ${staff.staffStatus}")
+                    Text(text = "Name: ${staff.name}",color= lightgray)
+                    Text(text = "Email: ${staff.email}",color= lightgray)
+                    Text(text = "Department ID: ${staff.departmentId}",color= lightgray)
+                    Text(text = "Status: ${staff.staffStatus}",color= lightgray)
                 }
             },
             confirmButton = {
-                Button(onClick = { showDialog.value = false }) {
-                    Text("Close")
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
+                    onClick = { showDialog.value = false }) {
+                    Text("Close",color= darkBackground)
                 }
-            }
+            }, containerColor = darkBackground
         )
     }
 }
