@@ -419,6 +419,7 @@ fun RemoveEmployee(repo: Repository) {
                             employeeId = ""
                             removeEmployee = false
                         }
+                        removeEmployee = false
                     },
                 ) {
                     Text("Remove")
