@@ -22,7 +22,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -36,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +48,8 @@ import com.example.taskmanager.profileComponents.out.TaskDifficulty
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.systems.EvaluationSystem
 import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -122,6 +124,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             text = "My Departments",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -135,8 +138,8 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Pool(ctoId, "Open", Color(0x666650a4), openTasks, false, repo) { refreshTasks(departmentId) }
-                Pool(ctoId, "Active", Color(0x666790a4), activeTasks, false, repo) { refreshTasks(departmentId) }
+                Pool(ctoId, "Open", Color.White, openTasks, false, repo) { refreshTasks(departmentId) }
+                Pool(ctoId, "Active", darkBackground, activeTasks, false, repo) { refreshTasks(departmentId) }
             }
         }
     }
@@ -151,7 +154,8 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                 taskDifficulty = TaskDifficulty.LOW
                 dropdownExpanded = false
             },
-            title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
+            title = { Text("Add New Task", fontWeight = FontWeight.Bold,
+                fontStyle = FontStyle.Italic,color= lightgray) },
             text = {
                 Column(
                     modifier = Modifier
@@ -161,14 +165,14 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                     TextField(
                         value = taskName,
                         onValueChange = { taskName = it },
-                        label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold,color= lightgray) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     TextField(
                         value = taskDescription,
                         onValueChange = { taskDescription = it },
-                        label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Task Description:", fontWeight = FontWeight.Bold ,color= lightgray) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                         modifier = Modifier.height(100.dp)
                     )
@@ -176,7 +180,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                     TextField(
                         value = taskDueDate,
                         onValueChange = { taskDueDate = it },
-                        label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold,color= lightgray) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -190,16 +194,19 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                             text = "Select Difficulty:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= lightgray
                         )
                         Text(
-                            text = taskDifficulty.name
+                            text = taskDifficulty.name,
+                                    color= lightgray
                         )
                     }
                     DropdownMenu(
                         expanded = dropdownExpanded,
                         onDismissRequest = { dropdownExpanded = false },
-                        modifier = Modifier
+                        modifier = Modifier .background(lightpurple),
+
                     ) {
                         DropdownMenuItem(text = { Text("Easy") }, onClick = {
                             taskDifficulty = TaskDifficulty.LOW
@@ -218,6 +225,9 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             },
             confirmButton = {
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                     onClick = {
                         coroutineScope.launch {
                             val cto = repo.getCTOById(ctoId)
@@ -241,11 +251,14 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                         showAddDialog = false
                     },
                 ) {
-                    Text("Add")
+                    Text("Add",color= darkBackground)
                 }
             },
             dismissButton = {
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                     onClick = {
                         showAddDialog = false
                         taskName = ""
@@ -255,9 +268,9 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
                         dropdownExpanded = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= darkBackground)
                 }
-            }
+            }, containerColor = darkBackground
         )
     }
 
@@ -282,7 +295,7 @@ fun DepartmentNavigationBar(
             DepartmentNavigationButton(
                 department = department,
                 isSelected = selectedDepartmentId == department.id,
-                onDepartmentSelected = onDepartmentSelected
+                onDepartmentSelected = onDepartmentSelected,
             )
         }
     }
@@ -300,8 +313,8 @@ fun DepartmentNavigationButton(
         },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+            containerColor = if (isSelected) darkBackground else lightpurple,
+            contentColor = if (isSelected) lightpurple else darkBackground
         ),
         modifier = Modifier.padding(vertical = 4.dp)
     ) {
