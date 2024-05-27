@@ -62,11 +62,13 @@ fun Pool(
             modifier = Modifier
                 .size(width = 800.dp, height = 280.dp)
                 .padding(top = 10.dp, start = 20.dp, end = 10.dp)
-                .background(lightpurple,shape = RoundedCornerShape(10.dp)),
+                .background(lightpurple, shape = RoundedCornerShape(12.dp)),
             horizontalAlignment = Alignment.Start,
         ) {
-            Text(text = "$name Tasks", color= darkBackground,fontSize = 25.sp,
+            Spacer(modifier = Modifier.padding(top = 8.dp) )
+            Text(text = "   $name Tasks", color= darkBackground,fontSize = 25.sp,
                 fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)
+
 
             LazyColumn(
                 modifier = Modifier
