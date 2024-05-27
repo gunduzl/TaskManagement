@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,8 +42,10 @@ import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.profileComponents.out.TaskWithStaff
 import com.example.taskmanager.systems.EvaluationSystem
-import com.example.taskmanager.ui.theme.customGreen
-import com.example.taskmanager.ui.theme.customPurple
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.gray
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 
@@ -90,8 +93,8 @@ fun MyTasks(repo: Repository, staffId: Int) {
 @Composable
 fun TaskItem(task: Task, staffNames: List<String>) {
     val statusColor = when (task.status) {
-        TaskStatus.CLOSED -> customGreen
-        TaskStatus.ACTIVE -> customPurple
+        TaskStatus.CLOSED -> Color.White
+        TaskStatus.ACTIVE -> darkBackground
         else -> Color.Gray
     }
 
@@ -117,13 +120,14 @@ fun TaskItem(task: Task, staffNames: List<String>) {
         Text(
             text = task.title,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color= lightgray
         )
         icon?.let {
             Icon(
                 imageVector = it,
                 contentDescription = "Icon",
-                tint = if (task.status == TaskStatus.CLOSED) Color.Green else Color.Blue,
+                tint = if (task.status == TaskStatus.CLOSED) darkBackground else lightgray,
                 modifier = Modifier.padding(end = 8.dp)
             )
         }
@@ -131,7 +135,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
             Text(
                 text = task.status.toString(),
                 fontStyle = FontStyle.Italic,
-                color = Color.Green,
+                color = darkBackground,
                 modifier = Modifier.padding(end = 8.dp)
             )
         } else {
@@ -145,7 +149,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
                     )
                     */
 
-                    Button(
+                    Button( colors = ButtonDefaults.buttonColors(containerColor = lightgray),
                         onClick = {
                             coroutineScope.launch {
                                 task.status = TaskStatus.CLOSED
@@ -164,7 +168,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
                             }
                         },
                     ) {
-                        Text("Submit")
+                        Text("Submit",color= darkBackground)
                     }
 
                 }
@@ -179,19 +183,21 @@ fun TaskItem(task: Task, staffNames: List<String>) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Task Details", fontWeight = FontWeight.Bold) },
+            title = { Text("Task Details", fontWeight = FontWeight.Bold,color= lightpurple) },
             text = {
                 Column {
-                    Text(text = "Task Name: ${task.title}")
-                    Text(text = "Status: ${task.status}")
+                    Text(text = "Task Name: ${task.title}",color= lightgray)
+                    Text(text = "Status: ${task.status}",color= lightgray)
                     staffNames.forEach { staffName ->
-                        Text(text = "Assigned to: $staffName")
+                        Text(text = "Assigned to: $staffName",color= lightgray)
                     }
                 }
             },
             confirmButton = {
                 if (task.status == TaskStatus.ACTIVE) {
-                    Button(
+                    Button( colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                         onClick = {
                             coroutineScope.launch {
                                 task.isHelp = HelpType.Requested
@@ -200,17 +206,19 @@ fun TaskItem(task: Task, staffNames: List<String>) {
 
                         }
                     ) {
-                        Text("Ask Help")
+                        Text("Ask Help",color= gray)
                     }
                 }
             },
             dismissButton = {
-                Button(
+                Button( colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = { showDialog.value = false },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= gray)
                 }
-            }
+            }, containerColor = darkBackground
         )
     }
 }

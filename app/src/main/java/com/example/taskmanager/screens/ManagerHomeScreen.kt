@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +42,9 @@ import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskDifficulty
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.systems.EvaluationSystem
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,11 +82,15 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp, start = 20.dp, end = 10.dp)
+
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(180.dp)
         ) {
-            Button(onClick = { setShowNotification(true) }) {
+            Button(  colors = ButtonDefaults.buttonColors(
+                containerColor = darkBackground
+            ),
+                onClick = { setShowNotification(true) }) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
             }
         }
@@ -93,10 +102,14 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                 text = "My Department",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end = 20.dp, start = 40.dp)
+                modifier = Modifier.padding(end = 20.dp, start = 40.dp),
+                fontStyle = FontStyle.Italic
             )
 
-            Button(onClick = {
+            Button( colors = ButtonDefaults.buttonColors(
+                containerColor = darkBackground
+            ),
+                onClick = {
                 showAddDialog = true
                 taskName = ""
                 taskDescription = ""
@@ -108,13 +121,13 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
         }
 
         // Pools
-        Pool(managerId, "Open", Color(0x666650a4), openTasks, false, repo, ::refreshTasks)
-        Pool(managerId, "Active", Color(0x666790a4), activeTasks, false, repo, ::refreshTasks)
+        Pool(managerId, "Open", Color.White , openTasks, false, repo, ::refreshTasks)  // open task 3ün çerçevesi
+        Pool(managerId, "Active", darkBackground, activeTasks, false, repo, ::refreshTasks)
 
         if (showAddDialog) {
             AlertDialog(
                 onDismissRequest = { showAddDialog = false },
-                title = { Text("Add New Task", fontWeight = FontWeight.Bold) },
+                title = { Text("Add New Task", fontWeight = FontWeight.Bold,color= lightgray) },
                 text = {
                     Column(
                         modifier = Modifier
@@ -123,7 +136,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                         TextField(
                             value = taskName,
                             onValueChange = { taskName = it },
-                            label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold) },
+                            label = { Text("Enter Task Name:", fontWeight = FontWeight.Bold,color= lightgray) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                         )
 
@@ -133,7 +146,8 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                             label = {
                                 Text(
                                     "Enter Task Description:",
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color= lightgray
                                 )
                             },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
@@ -143,7 +157,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                         TextField(
                             value = taskDueDate,
                             onValueChange = { taskDueDate = it },
-                            label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold) },
+                            label = { Text("Enter Due Date:", fontWeight = FontWeight.Bold,color= lightgray) },
                             colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                         )
 
@@ -157,23 +171,26 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                                 text = "Select Difficulty:",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
-                                modifier = Modifier.padding(end = 8.dp)
+                                modifier = Modifier.padding(end = 8.dp),
+                                color= lightgray
                             )
                             Text(
-                                text = taskDifficulty.name
+                                text = taskDifficulty.name,
+                                color= lightgray
                             )
                         }
 
                         DropdownMenu(
                             expanded = dropdownExpanded,
                             onDismissRequest = { dropdownExpanded = false },
-                            modifier = Modifier
+                            modifier = Modifier .background(lightpurple)
                         ) {
                             DropdownMenuItem(text = { Text("Easy") }, onClick = {
                                 taskDifficulty = TaskDifficulty.LOW
                                 dropdownExpanded = false
                             })
-                            DropdownMenuItem(text = { Text("Medium") }, onClick = {
+                            DropdownMenuItem(text = { Text("Medium") }
+                                , onClick = {
                                 taskDifficulty = TaskDifficulty.MEDIUM
                                 dropdownExpanded = false
                             })
@@ -185,7 +202,9 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                     }
                 },
                 confirmButton = {
-                    Button(
+                    Button(colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                         onClick = {
                             if (taskName.isBlank() || taskDescription.isBlank() || taskDueDate.isBlank()) {
                                 showErrorDialog = true
@@ -214,11 +233,13 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                             }
                         }
                     ) {
-                        Text("Add")
+                        Text("Add" ,color= darkBackground)
                     }
                 },
                 dismissButton = {
-                    Button(
+                    Button(colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                         onClick = {
                             showAddDialog = false
                             taskName = ""
@@ -227,24 +248,27 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
                             dropdownExpanded = false
                         }
                     ) {
-                        Text("Cancel")
+                        Text("Cancel",color= darkBackground)
                     }
                 }
+                , containerColor = darkBackground // Custom background color
             )
         }
 
         if (showErrorDialog) {
             AlertDialog(
                 onDismissRequest = { showErrorDialog = false },
-                title = { Text("Error", fontWeight = FontWeight.Bold) },
-                text = { Text("Please fill out all fields before adding the task.") },
+                title = { Text("Error", fontWeight = FontWeight.Bold,color= darkBackground) },
+                text = { Text("Please fill out all fields before adding the task.",color= darkBackground) },
                 confirmButton = {
-                    Button(
+                    Button( colors = ButtonDefaults.buttonColors(
+                        containerColor = darkBackground),
                         onClick = { showErrorDialog = false }
                     ) {
-                        Text("OK")
+                        Text("OK",color= lightgray)
                     }
                 }
+                , containerColor = lightpurple
             )
         }
     }

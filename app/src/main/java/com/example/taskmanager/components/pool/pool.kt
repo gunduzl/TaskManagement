@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +42,9 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskStatus
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,15 +61,17 @@ fun Pool(
         Column(
             modifier = Modifier
                 .size(width = 800.dp, height = 280.dp)
-                .padding(top = 10.dp, start = 20.dp, end = 10.dp),
+                .padding(top = 10.dp, start = 20.dp, end = 10.dp)
+                .background(lightpurple,shape = RoundedCornerShape(10.dp)),
             horizontalAlignment = Alignment.Start,
         ) {
-            Text(text = "$name Tasks", fontSize = 25.sp, fontWeight = FontWeight.Bold)
+            Text(text = "$name Tasks", color= darkBackground,fontSize = 25.sp,
+                fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)
 
             LazyColumn(
                 modifier = Modifier
                     .padding(10.dp)
-                    .background(SolidColor(Color.White), shape = RoundedCornerShape(15.dp))
+                    .background(SolidColor(lightpurple), shape = RoundedCornerShape(15.dp))
             ) {
                 items(tasks.size) { index ->
                     val task = tasks[index]
@@ -112,7 +118,8 @@ fun TaskItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = task.title, fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+            Text(text = task.title,color= lightgray, fontSize = 20.sp,
+                textAlign = TextAlign.Left, fontWeight = FontWeight.Bold) //TASK İSİMLERİ
             Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing between buttons
             if(task.isHelp == HelpType.Requested && employeeRole == Role.MANAGER && showButtons){
                 Row {
@@ -158,21 +165,23 @@ fun TaskItem(
                     if(task.isHelp == HelpType.Confirmed){
                         Text("HELP")
                     }
-                    Row { Text("Description: ", fontWeight = FontWeight.Bold) }
-                    Row { Text(task.description) }
-                    Row { Text("Due Date:  ", fontWeight = FontWeight.Bold) }
-                    Row { Text(task.deadline) }
-                    Row { Text("Time Left: ", fontWeight = FontWeight.Bold) }
-                    Row { Text("30 Seconds") } // This should be dynamically calculated
-                    Row { Text("Difficulty: ", fontWeight = FontWeight.Bold) }
-                    Row { Text(task.difficulty.name) }
+                    Row { Text("Description: ", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text(task.description ,color= lightgray) }
+                    Row { Text("Due Date:  ", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text(task.deadline,color= lightgray) }
+                    Row { Text("Time Left: ", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("30 Seconds",color= lightgray) } // This should be dynamically calculated
+                    Row { Text("Difficulty: ", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text(task.difficulty.name,color= lightgray )}
 
                 }
             },
             confirmButton = {
 
                 if(task.status==TaskStatus.OPEN && isStaff){
-                    Button(
+                    Button(                        colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                         onClick = {
                             coroutineScope.launch {
                                 repo.takeTask(employeeId, task.id) // First take the task
@@ -182,12 +191,15 @@ fun TaskItem(
                                 showDialog = false
                             }
                         }
-                    ) { Text("Take Task") }
+                    ) { Text("Take Task",color= darkBackground) }
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) { Text("Cancel") }
-            }
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
+                    onClick = { showDialog = false }) { Text("Cancel" ,color= darkBackground) }
+            },  containerColor = darkBackground
         )
     }
 }

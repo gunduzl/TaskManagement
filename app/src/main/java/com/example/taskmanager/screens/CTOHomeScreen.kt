@@ -47,6 +47,7 @@ import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskDifficulty
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.systems.EvaluationSystem
+import com.example.taskmanager.ui.theme.darkBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -102,14 +103,14 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
             Button(
                 onClick = { setShowNotification(true) },
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(containerColor = darkBackground)
             ) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
             }
             Button(
                 onClick = { showAddDialog = true },
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                colors = ButtonDefaults.buttonColors(containerColor = darkBackground)
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
