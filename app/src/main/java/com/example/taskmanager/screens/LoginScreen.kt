@@ -1,11 +1,13 @@
 package com.example.taskmanager
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -17,12 +19,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.gray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,22 +41,33 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
     var errorMessage by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+        .background(darkBackground),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Spacer(modifier = Modifier.height(50.dp))
         Text(
-            text = "Login to your account",
-            fontSize = 24.sp,
+            text = "Welcome To Task Manager" ,color=Color(0xFFC0BCC9),
+            fontStyle = FontStyle.Italic,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Please Login to continue",color=Color(0xFFC0BCC9),
+            fontStyle = FontStyle.Italic,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(70.dp))
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(text = "Email Address") }
+            label = { Text(text = "Email Address", color =Color(0xFFC0BCC9) ) },
+            textStyle = TextStyle(color = Color.White)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -57,13 +75,18 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(text = "Password") },
+            label = { Text(text = "Password", color =Color(0xFFC0BCC9) ) },
+            textStyle = TextStyle(color = Color.White),
             visualTransformation = PasswordVisualTransformation(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = lightpurple
+            ),
+            onClick = {
             // Use LaunchedEffect to handle the coroutine
             CoroutineScope(Dispatchers.IO).launch {
                 val employee = authenticateUser(repo, email, password)
@@ -78,7 +101,7 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
                 }
             }
         }) {
-            Text(text = "Login")
+            Text(text = "Login",color= gray)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -91,10 +114,10 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(1.dp))
 
         TextButton(onClick = { }) {
-            Text(text = "Forgot Password?")
+            Text(text = "Forgot Password?", color = lightpurple)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Notification
 import com.example.taskmanager.profileComponents.out.Repository
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +59,8 @@ fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
                 Text(
                     text = "Notifications",
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = lightgray
                 )
             },
             text = {
@@ -62,14 +68,18 @@ fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
             },
             confirmButton = {
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                     onClick = {
                         alertDialogState.value = false
                         onClose()
                     }
                 ) {
-                    Text("Close")
+                    Text("Close", color = darkBackground)
                 }
             }
+            , containerColor = darkBackground // Custom background color
         )
     }
 }
@@ -92,7 +102,8 @@ fun NotificationItem(notification: Notification) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 2.dp, vertical = 8.dp)
-            .border(2.dp, Color(0xFFD0BCFF), shape = RoundedCornerShape(10.dp))
+            .border(2.dp, lightgray, shape = RoundedCornerShape(10.dp))
+            .background(lightpurple,shape = RoundedCornerShape(10.dp))
             .clickable { },
         horizontalAlignment = Alignment.Start
     ) {

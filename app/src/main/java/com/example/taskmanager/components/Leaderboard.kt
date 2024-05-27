@@ -18,11 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Staff
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightgray
 
 //data class Staff(val name: String, val score: Int)
 
@@ -67,9 +70,12 @@ fun LeaderboardHeader() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Rank", fontWeight = FontWeight.Bold)
-        Text(text = "Name", fontWeight = FontWeight.Bold)
-        Text(text = "Score", fontWeight = FontWeight.Bold)
+        Text(text = "Rank", fontWeight = FontWeight.Bold, fontSize = 20.sp,
+            fontStyle = FontStyle.Italic,color= darkBackground)
+        Text(text = "Name", fontWeight = FontWeight.Bold, fontSize = 20.sp,
+            fontStyle = FontStyle.Italic,color= darkBackground)
+        Text(text = "Score", fontWeight = FontWeight.Bold,fontSize = 20.sp,
+            fontStyle = FontStyle.Italic,color= darkBackground)
     }
 }
 
@@ -78,30 +84,34 @@ fun LeaderboardEntry(rank:Int,name: String, score: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(2.dp, Color(0xFFD0BCFF), shape = RoundedCornerShape(15.dp))
-            .padding(top = 20.dp, start = 30.dp, end = 30.dp)
+            .border(2.dp, Color(0xFF00658F), shape = RoundedCornerShape(15.dp))
+            .padding(top = 1.dp, start = 1.dp, end = 1.dp)
             .height(60.dp)
+            .background(darkBackground, shape = RoundedCornerShape(15.dp))
             .clickable { },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "$rank",
+            text = "    $rank",
             fontSize = 20.sp,
             textAlign = TextAlign.Left,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = lightgray
         )
         Text(
             text = "$name",
             fontSize = 20.sp,
             textAlign = TextAlign.Left,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = lightgray
         )
         Text(
-            text = "$score",
+            text = "$score    ",
             fontSize = 20.sp,
             textAlign = TextAlign.Right,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = lightgray
         )
 
 

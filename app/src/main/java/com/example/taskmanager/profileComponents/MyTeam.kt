@@ -36,6 +36,9 @@ import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.StaffStatus
 import com.example.taskmanager.ui.theme.customGreen
 import com.example.taskmanager.ui.theme.customPurple
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.light
+import com.example.taskmanager.ui.theme.lightgray
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,6 +63,7 @@ fun MyTeam(repo: Repository, managerId: Int) {
         ) {
             Text(
                 text = "My Team",
+                fontStyle = FontStyle.Italic, color= darkBackground,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 10.dp)
@@ -86,7 +90,7 @@ fun MyTeam(repo: Repository, managerId: Int) {
 
 @Composable
 fun StaffItem(staff: Staff) {
-    val statusColor = if (staff.staffStatus == StaffStatus.BUSY) customPurple else customGreen
+    val statusColor = if (staff.staffStatus == StaffStatus.BUSY)  darkBackground else light
 
     val showDialog = remember { mutableStateOf(false) }
 
@@ -108,13 +112,13 @@ fun StaffItem(staff: Staff) {
             Text(
                 text = "Available",
                 fontStyle = FontStyle.Italic,
-                color = Color.Green
+                color = darkBackground
             )
         } else {
             Text(
                 text = "Busy",
                 fontStyle = FontStyle.Italic,
-                color = Color.Red
+                color = lightgray
             )
         }
     }
