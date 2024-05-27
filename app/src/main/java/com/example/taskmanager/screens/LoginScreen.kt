@@ -1,5 +1,6 @@
 package com.example.taskmanager
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 @Composable
 fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId: Int) -> Unit) {
     var email by remember { mutableStateOf("") }
@@ -47,7 +50,11 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Image(
+            painter = painterResource(id = R.drawable.file),
+            contentDescription = "App Icon",
+            modifier = Modifier.height(100.dp)
+        )
         Text(
             text = "Welcome To Task Manager" ,color=Color(0xFFC0BCC9),
             fontStyle = FontStyle.Italic,

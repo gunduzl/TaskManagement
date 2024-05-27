@@ -19,6 +19,8 @@ class Repository {
     init {
         // Initialize with some dummy data
         createInitialData()
+        // Schedule the monthly evaluation task
+        scheduleMonthlyEvaluation()
     }
 
     private fun createInitialData() {
@@ -44,7 +46,7 @@ class Repository {
                 Manager(8, "Ali", "ali@gmail.com", "password", Role.MANAGER, 6, 2),
                 Manager(9, "Mert", "mert@gmail.com", "password", Role.MANAGER, 7, 3),
                 CTO(10, "Elif", "cto@gmail.com", "password", Role.CTO),
-                Admin(11,"Oguzhan","admin@gmail.com","password",Role.ADMIN)
+                Admin(11, "Oguzhan", "admin@gmail.com", "password", Role.ADMIN)
             )
         )
 
@@ -61,17 +63,142 @@ class Repository {
 
         notificationList.addAll(
             listOf(
-                Notification(1,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 1),
-                Notification(2,"Reminder","Don't forget your meeting at 2 PM","Yesterday", Role.STAFF, 1),
-                Notification(3,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 3),
-                Notification(4,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 4),
-                Notification(5,"New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 5),
-                Notification(6,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 8),
-                Notification(7,"New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 9),
-                Notification(8,"New Message", "You have a new message from Jane", "10:30 AM", Role.CTO, 10)
+                Notification(1, "New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 1),
+                Notification(2, "Reminder", "Don't forget your meeting at 2 PM", "Yesterday", Role.STAFF, 1),
+                Notification(3, "New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 3),
+                Notification(4, "New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 4),
+                Notification(5, "New Message", "You have a new message from Jane", "10:30 AM", Role.STAFF, 5),
+                Notification(6, "New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 8),
+                Notification(7, "New Message", "You have a new message from Jane", "10:30 AM", Role.MANAGER, 9),
+                Notification(8, "New Message", "You have a new message from Jane", "10:30 AM", Role.CTO, 10)
             )
         )
     }
+
+    // Method to perform monthly evaluation
+    suspend fun performMonthlyEvaluation() = mutex.withLock {
+
+
+        // 2. Send notifications for top 3 performers to each department manager
+        departmentList.forEach { department ->
+            val staffInDepartment = employeeList.filterIsInstance<Staff>().filter { it.departmentId == department.id }
+            val topPerformers = staffInDepartment.sortedByDescending { it.staffPoint }.take(3)
+            topPerformers.forEach { staff ->
+                notificationList.add(Notification(
+                    id = generateNotificationId(),
+                    title = "Top Performer",
+                    description = "${staff.name} is one of the top 3 performers this month.",
+                    date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                    employeeType = Role.MANAGER,
+                    employeeId = staff.departmentManagerId
+                ))
+            }
+        }
+
+        // 3. Send notifications for bottom 3 performers to each department manager
+        departmentList.forEach { department ->
+            val staffInDepartment = employeeList.filterIsInstance<Staff>().filter { it.departmentId == department.id }
+            val bottomPerformers = staffInDepartment.sortedBy { it.staffPoint }.take(3)
+            bottomPerformers.forEach { staff ->
+                notificationList.add(Notification(
+                    id = generateNotificationId(),
+                    title = "Low Performer",
+                    description = "${staff.name} is one of the bottom 3 performers this month.",
+                    date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                    employeeType = Role.MANAGER,
+                    employeeId = staff.departmentManagerId
+                ))
+            }
+        }
+
+        // 4. Send notification for best department to CTO
+        val bestDepartment = departmentList.maxByOrNull { department ->
+            employeeList.filterIsInstance<Staff>().filter { it.departmentId == department.id }.sumOf { it.staffPoint }
+        }
+        bestDepartment?.let {
+            notificationList.add(Notification(
+                id = generateNotificationId(),
+                title = "Best Department",
+                description = "${it.name} is the best department this month.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.CTO,
+                employeeId = 10 // Assuming CTO ID is 10
+            ))
+        }
+
+        // send notification to CTO for best 3 staff among all departments
+        val bestStaffOverall = employeeList.filterIsInstance<Staff>().sortedByDescending { it.staffPoint }.take(3)
+        bestStaffOverall.forEach { staff ->
+            notificationList.add(Notification(
+                id = generateNotificationId(),
+                title = "Top Performer",
+                description = "${staff.name} is one of the top 3 performers this month.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.CTO,
+                employeeId = 10
+            ))
+        }
+
+
+        // 5. Send notifications for bonus and potential raise to managers
+        employeeList.filterIsInstance<Staff>().forEach { staff ->
+            if (staff.staffPoint > 20) {
+                notificationList.add(Notification(
+                    id = generateNotificationId(),
+                    title = "Bonus and Raise",
+                    description = "${staff.name} qualifies for a 5-10% bonus.",
+                    date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                    employeeType = Role.MANAGER,
+                    employeeId = staff.departmentManagerId
+                ))
+            } else if (staff.staffPoint > 10) {
+                notificationList.add(Notification(
+                    id = generateNotificationId(),
+                    title = "Bonus",
+                    description = "${staff.name} qualifies for a 3-5% bonus.",
+                    date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                    employeeType = Role.MANAGER,
+                    employeeId = staff.departmentManagerId
+                ))
+            }
+        }
+
+        // 6. Send notification for low performance to managers
+        val bottomPerformersOverall = employeeList.filterIsInstance<Staff>().sortedBy { it.staffPoint }.take(2)
+        bottomPerformersOverall.forEach { staff ->
+            notificationList.add(Notification(
+                id = generateNotificationId(),
+                title = "Performance Improvement",
+                description = "${staff.name} needs improvement. Consider a one-on-one meeting or course assignment.",
+                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                employeeType = Role.MANAGER,
+                employeeId = staff.departmentManagerId
+            ))
+        }
+
+
+        // Reset all staff scores to zero
+        employeeList.filterIsInstance<Staff>().forEach { it.staffPoint = 0 }
+    }
+
+    private fun generateNotificationId(): Int {
+        return (notificationList.maxOfOrNull { it.id } ?: 0) + 1
+    }
+
+    private fun scheduleMonthlyEvaluation() {
+        val delay = 3 * 60 * 1000L // 3 minutes in milliseconds
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runBlocking {
+                    performMonthlyEvaluation()
+                }
+            }
+        }, delay, delay) // Schedule the task to run every 3 minutes
+    }
+
+
+
+    // Existing repository methods...
 
     suspend fun getEmployeeByEmailAndPassword(email: String, password: String): Employee? = mutex.withLock {
         return employeeList.find { it.email == email && it.password == password }
@@ -179,7 +306,6 @@ class Repository {
         }, delay)
     }
 
-
     private fun sendTaskDeadlineNotification(task: Task) {
         val relatedStaff = task.owners
         relatedStaff.forEach { staff ->
@@ -195,10 +321,6 @@ class Repository {
                 insertNotification(notification)
             }
         }
-    }
-
-    private fun generateNotificationId(): Int {
-        return (notificationList.maxOfOrNull { it.id } ?: 0) + 1
     }
 
     suspend fun insertTaskStaffCrossRef(crossRef: TaskStaffCrossRef) = mutex.withLock {
@@ -276,8 +398,6 @@ class Repository {
             employeeList.remove(employeeToDelete)
         }
     }
-
-
 
     suspend fun updateEmployeeRole(employeeId: Int, newRole: Role) = mutex.withLock {
         val employeeIndex = employeeList.indexOfFirst { it.id == employeeId }
@@ -362,14 +482,13 @@ class Repository {
         }
     }
 
-
     suspend fun deleteDepartmentByName(departmentName: String) = mutex.withLock {
         val departmentToDelete = departmentList.find { it.name == departmentName }
         if (departmentToDelete != null) {
             // Remove employees associated with the department
             val employeesToRemove = mutableListOf<Employee>()
-            employeesToRemove.addAll(employeeList.filter { (it is Staff ) && it.departmentId == departmentToDelete.id })
-            employeesToRemove.addAll(employeeList.filter { (it is Manager ) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Staff) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Manager) && it.departmentId == departmentToDelete.id })
             employeeList.removeAll(employeesToRemove)
 
             // Remove the department
@@ -382,18 +501,18 @@ class Repository {
         if (departmentToDelete != null) {
             // Remove employees associated with the department
             val employeesToRemove = mutableListOf<Employee>()
-            employeesToRemove.addAll(employeeList.filter { (it is Staff ) && it.departmentId == departmentToDelete.id })
-            employeesToRemove.addAll(employeeList.filter { (it is Manager ) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Staff) && it.departmentId == departmentToDelete.id })
+            employeesToRemove.addAll(employeeList.filter { (it is Manager) && it.departmentId == departmentToDelete.id })
             employeeList.removeAll(employeesToRemove)
 
             // Remove the department
             departmentList.remove(departmentToDelete)
         }
     }
+
     suspend fun getAllDepartments(): List<Department> = mutex.withLock {
         return departmentList.toList()
     }
-
 }
 
 open class Employee(
@@ -410,7 +529,7 @@ class Staff(
     email: String,
     password: String,
     role: Role,
-    //Alper
+    // Alper
     var staffPoint: Int,
     var staffStatus: StaffStatus,
     val departmentId: Int,
@@ -443,7 +562,6 @@ class Admin(
     password: String,
     role: Role
 ) : Employee(id, name, email, password, role)
-
 
 enum class StaffStatus {
     AVAILABLE,

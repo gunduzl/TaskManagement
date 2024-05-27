@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,19 +37,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.taskmanager.R
 import com.example.taskmanager.profileComponents.out.Department
+import com.example.taskmanager.profileComponents.out.Notification
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.StaffStatus
 import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.lightgray
 import com.example.taskmanager.ui.theme.lightpurple
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
@@ -57,32 +63,45 @@ fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     val (showNotification, setShowNotification) = remember { mutableStateOf(false) }
     val ctoName = remember { mutableStateOf("Loading...") }
     val departments = remember { mutableStateOf<List<Department>>(emptyList()) }
+    val notifications = remember { mutableStateOf<List<Notification>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(ctoId) {
-        coroutineScope.launch {
-            val ctoWithDepartments = repo.getCTOWithDepartments(ctoId)
-            if (ctoWithDepartments.isNotEmpty()) {
-                val ctoDepartments = ctoWithDepartments.first()
-                ctoName.value = ctoDepartments.cto.name
-                departments.value = ctoDepartments.departments
-                if (departments.value.isNotEmpty()) {
-                    setSelectedDepartmentId(departments.value.first().id)
-                }
+    suspend fun refreshProfileScreen() {
+        val ctoWithDepartments = repo.getCTOWithDepartments(ctoId)
+        if (ctoWithDepartments.isNotEmpty()) {
+            val ctoDepartments = ctoWithDepartments.first()
+            ctoName.value = ctoDepartments.cto.name
+            departments.value = ctoDepartments.departments
+            if (departments.value.isNotEmpty()) {
+                setSelectedDepartmentId(departments.value.first().id)
             }
+            notifications.value = repo.getNotificationsById(ctoId)
+        }
+    }
+
+    suspend fun refreshPagePeriodically() {
+        while (true) {
+            refreshProfileScreen()
+            delay(1000)
+        }
+    }
+
+    LaunchedEffect(ctoId) {
+        withContext(Dispatchers.IO) {
+            refreshPagePeriodically()
         }
     }
 
     Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp)) {
         Button(colors = ButtonDefaults.buttonColors(
             containerColor = darkBackground
-        ),onClick = {
+        ), onClick = {
             // Navigate back to the login screen
             navController.navigate("/first_screen") {
                 popUpTo("/app-navigation") { inclusive = true }
             }
         }) {
-            Text("Logout",color= lightgray)
+            Text("Logout", color = lightgray)
         }
     }
 
@@ -103,7 +122,6 @@ fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     }
 }
 
-
 @Composable
 fun CTOProfileHeader(ctoName: String, setShowNotification: (Boolean) -> Unit) {
     Column(
@@ -123,7 +141,11 @@ fun CTOProfileHeader(ctoName: String, setShowNotification: (Boolean) -> Unit) {
 
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    ProfileIcon(icon = Icons.Default.Person)
+                    Image(
+                        painter = painterResource(id = R.drawable.z),
+                        contentDescription = "App Icon",
+                        modifier = Modifier.height(100.dp)
+                    )
                     Spacer(modifier = Modifier.width(25.dp))
                     Column {
                         Text(
@@ -171,16 +193,15 @@ fun MyTeam(repo: Repository, departmentId: Int) {
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxSize()
-                .background(lightpurple,shape = RoundedCornerShape(20.dp)),
+                .background(lightpurple, shape = RoundedCornerShape(20.dp)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "My Team" ,color= darkBackground,
+                text = "My Team", color = darkBackground,
                 fontSize = 25.sp,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 10.dp)
-
             )
             Spacer(modifier = Modifier.height(10.dp)) // Add spacer to create space before LazyColumn
             Box(
@@ -240,13 +261,13 @@ fun StaffItem(staff: Staff) {
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Staff Details", fontWeight = FontWeight.Bold,color= lightgray,fontStyle = FontStyle.Italic) },
+            title = { Text("Staff Details", fontWeight = FontWeight.Bold, color = lightgray, fontStyle = FontStyle.Italic) },
             text = {
                 Column {
-                    Text(text = "Name: ${staff.name}",color= lightgray)
-                    Text(text = "Email: ${staff.email}",color= lightgray)
-                    Text(text = "Department ID: ${staff.departmentId}",color= lightgray)
-                    Text(text = "Status: ${staff.staffStatus}",color= lightgray)
+                    Text(text = "Name: ${staff.name}", color = lightgray)
+                    Text(text = "Email: ${staff.email}", color = lightgray)
+                    Text(text = "Department ID: ${staff.departmentId}", color = lightgray)
+                    Text(text = "Status: ${staff.staffStatus}", color = lightgray)
                 }
             },
             confirmButton = {
@@ -254,7 +275,7 @@ fun StaffItem(staff: Staff) {
                     containerColor = lightpurple
                 ),
                     onClick = { showDialog.value = false }) {
-                    Text("Close",color= darkBackground)
+                    Text("Close", color = darkBackground)
                 }
             }, containerColor = darkBackground
         )

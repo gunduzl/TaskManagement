@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,19 +35,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.taskmanager.R
 import com.example.taskmanager.profileComponents.MyTasks
 import com.example.taskmanager.profileComponents.MyTeam
 import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Employee
+import com.example.taskmanager.profileComponents.out.Notification
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.lightpurple
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavController) {
@@ -56,13 +61,14 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
     var employeeRole by remember { mutableStateOf<Role?>(null) }
     var employeeDepartment by remember { mutableStateOf<Department?>(null) }
     var employeePoint by remember { mutableStateOf<Int?>(null) }
+    var notifications by remember { mutableStateOf<List<Notification>>(emptyList()) }
 
-
-    suspend fun refreshProfileScreen(){
+    suspend fun refreshProfileScreen() {
         employee = repo.getEmployeeById(employeeId)
         employeeRole = employee?.role
         employeeDepartment = repo.getDepartmentsFromEmployeeID(employeeId)
         employeePoint = repo.getPointFromEmployeeID(employeeId)
+        notifications = repo.getNotificationsById(employeeId)
     }
 
     suspend fun refreshPagePeriodically() {
@@ -71,9 +77,11 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
             delay(1000)
         }
     }
-    LaunchedEffect(employeeId) {
-        refreshPagePeriodically()
 
+    LaunchedEffect(employeeId) {
+        withContext(Dispatchers.IO) {
+            refreshPagePeriodically()
+        }
     }
 
     Column(
@@ -93,17 +101,15 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                         Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                     }
                     Button(
-
                         colors = ButtonDefaults.buttonColors(
                             containerColor = darkBackground
                         ),
                         onClick = {
-
-                        // Navigate back to the login screen
-                        navController.navigate("/first_screen") {
-                            popUpTo("/app-navigation") { inclusive = true }
-                        }
-                    }) {
+                            // Navigate back to the login screen
+                            navController.navigate("/first_screen") {
+                                popUpTo("/app-navigation") { inclusive = true }
+                            }
+                        }) {
                         Text("Logout")
                     }
                 }
@@ -112,7 +118,11 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
 
-                    ProfileIcon(icon = Icons.Default.Person)
+                    Image(
+                        painter = painterResource(id = R.drawable.man),
+                        contentDescription = "App Icon",
+                        modifier = Modifier.height(100.dp)
+                    )
 
                     Spacer(modifier = Modifier.width(25.dp))
 
@@ -123,7 +133,6 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                             color = Color(0xFF00658F),
                             fontStyle = FontStyle.Italic,
                             fontSize = 35.sp
-
                         )
                         Text(
                             text = employeeDepartment?.name ?: "Loading...",
@@ -132,7 +141,6 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                             fontStyle = FontStyle.Italic,
                             fontSize = 23.sp,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
-
                         )
                     }
                 }
@@ -191,7 +199,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .background(lightpurple , shape = RoundedCornerShape(16.dp))
+                .background(lightpurple, shape = RoundedCornerShape(16.dp))
         ) {
             val role = employeeRole
             if (role != null) {

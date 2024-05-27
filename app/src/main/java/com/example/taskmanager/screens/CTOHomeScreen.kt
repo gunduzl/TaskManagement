@@ -275,7 +275,7 @@ fun CTOHomeScreen(repo: Repository, ctoId: Int) {
     }
 
     if (showNotification) {
-        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = ctoId)
+       // NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = ctoId)
     }
 }
 
