@@ -1,6 +1,7 @@
 package com.example.taskmanager.screens
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +31,8 @@ import com.example.taskmanager.components.Leaderboard
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.TaskWithStaff
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.delay
 
 
@@ -54,20 +60,25 @@ fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = lightpurple)
             .padding(horizontal = 20.dp, vertical = 10.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { setShowNotification(true) }) {
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = darkBackground),
+                onClick = { setShowNotification(true) }) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
             }
             Spacer(modifier = Modifier.width(40.dp))
             Text(
                 text = "Leaderboard",
+                color = darkBackground,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontStyle = FontStyle.Italic
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -86,8 +97,6 @@ fun LeaderBoardScreen(repo: Repository,employeeId: Int) {
                 // Diğer girişler buraya eklenebilir
             )
             */
-
-
             Leaderboard(yourLeaderboardList.value)
 
         }

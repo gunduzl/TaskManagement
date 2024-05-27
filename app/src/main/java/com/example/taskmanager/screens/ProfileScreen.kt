@@ -1,5 +1,6 @@
 package com.example.taskmanager.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.taskmanager.profileComponents.MyTasks
 import com.example.taskmanager.profileComponents.MyTeam
@@ -40,6 +45,8 @@ import com.example.taskmanager.profileComponents.out.Department
 import com.example.taskmanager.profileComponents.out.Employee
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
@@ -79,10 +86,20 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
         LazyColumn {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(187.dp)) {
-                    Button(onClick = { setShowNotification(true) }) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = darkBackground
+                        ),
+                        onClick = { setShowNotification(true) }) {
                         Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                     }
-                    Button(onClick = {
+                    Button(
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = darkBackground
+                        ),
+                        onClick = {
+
                         // Navigate back to the login screen
                         navController.navigate("/first_screen") {
                             popUpTo("/app-navigation") { inclusive = true }
@@ -94,21 +111,29 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
             }
 
             item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+
                     ProfileIcon(icon = Icons.Default.Person)
 
                     Spacer(modifier = Modifier.width(25.dp))
 
-                    Column {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = employee?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary
+                            color = Color(0xFF00658F),
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 35.sp
+
                         )
                         Text(
                             text = employeeDepartment?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = darkBackground,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 23.sp,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+
                         )
                     }
                 }
@@ -124,8 +149,10 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                         .offset(x = 65.dp, y = 30.dp)
                 ) {
                     Surface(
-                        modifier = Modifier.size(180.dp, 50.dp),
-                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(180.dp, 50.dp)
+                            .offset(y = -20.dp),
+                        color = lightpurple,
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
@@ -142,7 +169,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                             Text(
                                 text = "Points: ${employeePoint ?: "Loading..."}",
                                 style = MaterialTheme.typography.titleLarge,
-                                color = Color.White,
+                                color = Color.DarkGray,
                                 modifier = Modifier.offset(x = 8.dp, y = 0.dp)
                             )
                             Spacer(modifier = Modifier.width(20.dp))
@@ -165,6 +192,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                .background(lightpurple , shape = RoundedCornerShape(16.dp))
         ) {
             val role = employeeRole
             if (role != null) {
