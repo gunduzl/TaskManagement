@@ -130,7 +130,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                         Text(
                             text = employee?.name ?: "Loading...",
                             style = MaterialTheme.typography.headlineLarge,
-                            color = Color(0xFF00658F),
+                            color = darkBackground,
                             fontStyle = FontStyle.Italic,
                             fontSize = 35.sp
                         )
