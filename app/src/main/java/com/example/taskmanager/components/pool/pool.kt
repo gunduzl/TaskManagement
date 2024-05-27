@@ -118,8 +118,14 @@ fun TaskItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = task.title,color= lightgray, fontSize = 20.sp,
-                textAlign = TextAlign.Left, fontWeight = FontWeight.Bold) //TASK İSİMLERİ
+            if(task.status == TaskStatus.OPEN){
+                Text(text = task.title,color= darkBackground, fontSize = 20.sp,
+                    textAlign = TextAlign.Left, fontWeight = FontWeight.Bold) //TASK İSİMLERİ
+            }else{
+                Text(text = task.title,color= lightgray, fontSize = 20.sp,
+                    textAlign = TextAlign.Left, fontWeight = FontWeight.Bold) //TASK İSİMLERİ
+            }
+
             Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing between buttons
             if(task.isHelp == HelpType.Requested && employeeRole == Role.MANAGER && showButtons){
                 Row {
@@ -156,7 +162,7 @@ fun TaskItem(
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Row{
-                Text(task.title, fontWeight = FontWeight.ExtraBold, fontStyle = FontStyle(10))
+                Text(task.title, color = lightgray ,fontWeight = FontWeight.ExtraBold, fontStyle = FontStyle(10))
                 Spacer(modifier = Modifier.width(30.dp))
                 Text("${task.taskPoint} Point",fontWeight = FontWeight.Medium, fontStyle = FontStyle(5 ), modifier = Modifier.alpha(0.5f))
             } },
