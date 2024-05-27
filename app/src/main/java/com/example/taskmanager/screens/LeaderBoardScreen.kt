@@ -85,6 +85,7 @@ fun LeaderBoardScreen(repo: Repository, employeeId: Int) {
 
             Text(
                 text = "Leaderboard",
+
                 color = darkBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,

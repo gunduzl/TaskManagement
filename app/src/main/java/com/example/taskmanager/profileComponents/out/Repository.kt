@@ -53,11 +53,11 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                // Alper
-                Task(1, "Task 1", "Description 1", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 5),
-                Task(2, "Task 2", "Description 2", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 6),
-                Task(3, "Task 3", "Description 3", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 7),
-                Task(4, "Task 4", "Description 4", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 8)
+                // Ali
+                Task(1, "Database Methods", "Database methods should be written.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 5),
+                Task(2, "Handle Exceptions", "Exception Library should be written.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 6),
+                Task(3, "Unit Test", "New Unit Tests Are Expected", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 7),
+                Task(4, "Test Security", "Corner Cases Should Be Tested", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 8)
             )
         )
 

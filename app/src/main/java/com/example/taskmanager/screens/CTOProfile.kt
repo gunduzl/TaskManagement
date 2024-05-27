@@ -53,7 +53,6 @@ import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.lightgray
 import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -64,7 +63,6 @@ fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
     val ctoName = remember { mutableStateOf("Loading...") }
     val departments = remember { mutableStateOf<List<Department>>(emptyList()) }
     val notifications = remember { mutableStateOf<List<Notification>>(emptyList()) }
-    val coroutineScope = rememberCoroutineScope()
 
     suspend fun refreshProfileScreen() {
         val ctoWithDepartments = repo.getCTOWithDepartments(ctoId)
@@ -79,16 +77,10 @@ fun CTOProfile(repo: Repository, ctoId: Int, navController: NavController) {
         }
     }
 
-    suspend fun refreshPagePeriodically() {
-        while (true) {
-            refreshProfileScreen()
-            delay(1000)
-        }
-    }
 
     LaunchedEffect(ctoId) {
         withContext(Dispatchers.IO) {
-            refreshPagePeriodically()
+            refreshProfileScreen()
         }
     }
 

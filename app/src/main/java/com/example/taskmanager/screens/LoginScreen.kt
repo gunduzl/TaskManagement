@@ -53,7 +53,7 @@ fun LoginScreen(repo: Repository, onLoginSuccess: (userRole: String, employeeId:
         Image(
             painter = painterResource(id = R.drawable.file),
             contentDescription = "App Icon",
-            modifier = Modifier.height(100.dp)
+            modifier = Modifier.height(270.dp)
         )
         Text(
             text = "Welcome To Task Manager" ,color=Color(0xFFC0BCC9),

@@ -60,7 +60,7 @@ fun MyTasks(repo: Repository, staffId: Int) {
     MaterialTheme {
         Column(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(10.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -78,8 +78,8 @@ fun MyTasks(repo: Repository, staffId: Int) {
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    contentPadding = PaddingValues(horizontal = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     items(tasks.value) { taskWithStaff ->
                         TaskItem(taskWithStaff.task, taskWithStaff.staff.map { it.name })
@@ -120,7 +120,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
         Text(
             text = task.title,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            fontSize = 15.sp,
             color= lightgray
         )
         icon?.let {

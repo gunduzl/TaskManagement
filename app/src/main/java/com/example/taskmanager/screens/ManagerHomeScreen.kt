@@ -274,6 +274,6 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     }
 
     if (showNotification) {
-       // NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = managerId)
+        NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = managerId)
     }
 }
