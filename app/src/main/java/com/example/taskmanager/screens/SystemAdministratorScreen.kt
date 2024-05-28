@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,8 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Role
 import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.StaffStatus
+import com.example.taskmanager.ui.theme.darkBackground
+import com.example.taskmanager.ui.theme.lightpurple
 import kotlinx.coroutines.launch
 
 
@@ -53,13 +56,15 @@ import kotlinx.coroutines.launch
 fun SystemAdministratorScreen(repo: Repository,employeeId: Int, navController: NavController) {
     MaterialTheme {
         Row(modifier = Modifier.padding(top = 10.dp, start = 280.dp, bottom = 200.dp)) {
-            Button(onClick = {
-                // Navigate back to the login screen
-                navController.navigate("/first_screen") {
-                    popUpTo("/app-navigation") { inclusive = true }
-                }
-            }) {
-                Text("Logout")
+            Button( colors = ButtonDefaults.buttonColors(
+                containerColor = darkBackground),
+                onClick = {
+                    // Navigate back to the login screen
+                    navController.navigate("/first_screen") {
+                        popUpTo("/app-navigation") { inclusive = true }
+                    }
+                }) {
+                Text("Logout",color= lightpurple)
             }
         }
         Column(
@@ -114,7 +119,7 @@ fun CreateEmployee(repo: Repository) {
 
     Row(
         modifier = Modifier
-            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
+            .background(lightpurple, shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -123,24 +128,24 @@ fun CreateEmployee(repo: Repository) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Create Employee", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+        Text(text = "Create Employee", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold ,color= darkBackground)
     }
 
     if (createEmployee) {
 
         AlertDialog(
             onDismissRequest = { createEmployee = false },
-            title = { Text("Add New Employee", fontWeight = FontWeight.Bold) },
+            title = { Text("Add New Employee", fontWeight = FontWeight.Bold,color= lightpurple) },
             text = {
                 Column(
                     modifier = Modifier
-                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .background(lightpurple, shape = RoundedCornerShape(20.dp))
                 ) {
 
                     TextField(
                         value = employeeName,
                         onValueChange = { employeeName = it },
-                        label = { Text("Enter Employee Name:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Employee Name:", fontWeight = FontWeight.Bold,color= darkBackground) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent),
                         modifier = Modifier.height(80.dp)
                     )
@@ -148,7 +153,7 @@ fun CreateEmployee(repo: Repository) {
                     TextField(
                         value = employeeSurname,
                         onValueChange = { employeeSurname = it },
-                        label = { Text("Enter Employee Surname:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Employee Surname:", fontWeight = FontWeight.Bold,color= darkBackground) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
                     Row(
@@ -161,7 +166,8 @@ fun CreateEmployee(repo: Repository) {
                             text = "Enter Department:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
@@ -173,7 +179,7 @@ fun CreateEmployee(repo: Repository) {
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         departments.forEach { department ->
                             DropdownMenuItem(text = { Text(department.name) },
@@ -196,7 +202,8 @@ fun CreateEmployee(repo: Repository) {
                             text = "Enter Employee Role:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeType.takeIf { it.isNotBlank() } ?: "Select Employee Type",
@@ -206,8 +213,10 @@ fun CreateEmployee(repo: Repository) {
                     DropdownMenu(
                         expanded = dropdownExpanded,
                         onDismissRequest = { dropdownExpanded = false },
-                        modifier = Modifier
-                    ) {
+                        modifier = Modifier .fillMaxWidth()
+                            .background(lightpurple),
+
+                        ) {
                         DropdownMenuItem(text = { Text("Staff") }, onClick = {
                             employeeType = "Staff"
                             dropdownExpanded = false
@@ -224,7 +233,9 @@ fun CreateEmployee(repo: Repository) {
                 }
             },
             confirmButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         coroutineScope.launch {
                             val lastEmployeeId = getLastEmployeeId() + 1
@@ -272,11 +283,13 @@ fun CreateEmployee(repo: Repository) {
                         dropdownExpanded = false
                     },
                 ) {
-                    Text("Add")
+                    Text("Add",color= darkBackground)
                 }
             },
             dismissButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         createEmployee = false
                         employeeName = ""
@@ -287,9 +300,9 @@ fun CreateEmployee(repo: Repository) {
                         dropdownExpanded = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= darkBackground)
                 }
-            }
+            } , containerColor = darkBackground
         )
     }
 }
@@ -316,7 +329,7 @@ fun RemoveEmployee(repo: Repository) {
 
     Row(
         modifier = Modifier
-            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
+            .background(lightpurple, shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -325,17 +338,17 @@ fun RemoveEmployee(repo: Repository) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Remove Employee", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+        Text(text = "Remove Employee", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold,color= darkBackground)
     }
 
     if (removeEmployee) {
         AlertDialog(
             onDismissRequest = { removeEmployee = false },
-            title = { Text("Remove Employee", fontWeight = FontWeight.Bold) },
+            title = { Text("Remove Employee", fontWeight = FontWeight.Bold,color= lightpurple) },
             text = {
                 Column(
                     modifier = Modifier
-                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .background(lightpurple, shape = RoundedCornerShape(20.dp))
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -347,7 +360,8 @@ fun RemoveEmployee(repo: Repository) {
                             text = "Enter Department:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
@@ -359,7 +373,7 @@ fun RemoveEmployee(repo: Repository) {
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         departments.forEach { department ->
                             DropdownMenuItem(text = { Text(department.name) },
@@ -382,7 +396,8 @@ fun RemoveEmployee(repo: Repository) {
                             text = "Enter Employee:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeName.takeIf { it.isNotBlank() } ?: "Select Employee",
@@ -394,7 +409,7 @@ fun RemoveEmployee(repo: Repository) {
                         onDismissRequest = { dropdownExpanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         employees.forEach { employee ->
                             DropdownMenuItem(text = { Text(employee.name) },
@@ -409,7 +424,9 @@ fun RemoveEmployee(repo: Repository) {
                 }
             },
             confirmButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         val id = employeeId.toIntOrNull()
                         if (id != null) {
@@ -422,19 +439,22 @@ fun RemoveEmployee(repo: Repository) {
                         removeEmployee = false
                     },
                 ) {
-                    Text("Remove")
+                    Text("Remove", color=darkBackground)
                 }
             },
             dismissButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         employeeId = ""
                         removeEmployee = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", color=darkBackground)
                 }
             }
+            , containerColor = darkBackground
         )
     }
 }
@@ -463,7 +483,7 @@ fun ChangeEmployeeRole(repo: Repository) {
 
     Row(
         modifier = Modifier
-            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
+            .background(lightpurple, shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -476,18 +496,19 @@ fun ChangeEmployeeRole(repo: Repository) {
             text = "Change Employee Role",
             fontSize = 20.sp,
             textAlign = TextAlign.Left,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color= darkBackground
         )
     }
 
     if (changeEmployeeRole) {
         AlertDialog(
             onDismissRequest = { changeEmployeeRole = false },
-            title = { Text("Change Employee Role", fontWeight = FontWeight.Bold) },
+            title = { Text("Change Employee Role", fontWeight = FontWeight.Bold,color= lightpurple) },
             text = {
                 Column(
                     modifier = Modifier
-                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .background(lightpurple, shape = RoundedCornerShape(20.dp))
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -499,7 +520,8 @@ fun ChangeEmployeeRole(repo: Repository) {
                             text = "Enter Department:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeDepartment.takeIf { it.isNotBlank() } ?: "Select Department",
@@ -510,7 +532,7 @@ fun ChangeEmployeeRole(repo: Repository) {
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         departments.forEach { department ->
                             DropdownMenuItem(text = { Text(department.name) },
@@ -533,7 +555,8 @@ fun ChangeEmployeeRole(repo: Repository) {
                             text = "Enter Employee:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = employeeName.takeIf { it.isNotBlank() } ?: "Select Employee",
@@ -545,7 +568,7 @@ fun ChangeEmployeeRole(repo: Repository) {
                         onDismissRequest = { dropdownExpandedEmp = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         employees.forEach { employee ->
                             //filteredEmployees.forEach { employee ->
@@ -568,7 +591,8 @@ fun ChangeEmployeeRole(repo: Repository) {
                             text = "Enter Employee Role:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            color= darkBackground
                         )
                         Text(
                             text = if (employeeRole.isNotBlank()) employeeRole else "Select Employee Type",
@@ -580,6 +604,8 @@ fun ChangeEmployeeRole(repo: Repository) {
                         expanded = dropdownExpanded,
                         onDismissRequest = { dropdownExpanded = false },
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .background(lightpurple)
                     ) {
                         DropdownMenuItem(text = { Text("Staff") }, onClick = {
                             employeeRole = "Staff"
@@ -597,7 +623,9 @@ fun ChangeEmployeeRole(repo: Repository) {
                 }
             },
             confirmButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         coroutineScope.launch {
                             when (employeeRole) {
@@ -611,20 +639,23 @@ fun ChangeEmployeeRole(repo: Repository) {
                         changeEmployeeRole = false
                     },
                 ) {
-                    Text("Change")
+                    Text("Change",color= darkBackground)
                 }
             },
             dismissButton = {
-                Button(
+                Button( colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         employeeId = ""
                         employeeRole = ""
                         changeEmployeeRole = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= darkBackground)
                 }
             }
+            , containerColor = darkBackground
         )
     }
 }
@@ -640,7 +671,7 @@ fun AddDepartment(repo: Repository) {
 
     Row(
         modifier = Modifier
-            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
+            .background(lightpurple, shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -649,29 +680,31 @@ fun AddDepartment(repo: Repository) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Add Department", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold)
+        Text(text = "Add Department", fontSize = 20.sp, textAlign = TextAlign.Left, fontWeight = FontWeight.Bold,color=darkBackground)
     }
 
     if (createDepartment) {
         AlertDialog(
             onDismissRequest = { createDepartment = false },
-            title = { Text("Add New Department", fontWeight = FontWeight.Bold) },
+            title = { Text("Add New Department", fontWeight = FontWeight.Bold,color=lightpurple) },
             text = {
                 Column(
                     modifier = Modifier
-                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .background(lightpurple, shape = RoundedCornerShape(20.dp))
                         .padding(5.dp, top = 10.dp, bottom = 10.dp)
                 ) {
                     TextField(
                         value = departmentName,
                         onValueChange = { departmentName = it },
-                        label = { Text("Enter Department Name:", fontWeight = FontWeight.Bold) },
+                        label = { Text("Enter Department Name:", fontWeight = FontWeight.Bold,color= darkBackground) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent)
                     )
                 }
             },
             confirmButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         coroutineScope.launch {
                             val depId = repo.getDepartmentIdByName(departmentName)
@@ -683,19 +716,22 @@ fun AddDepartment(repo: Repository) {
                         createDepartment = false
                     },
                 ) {
-                    Text("Add")
+                    Text("Add",color= darkBackground)
                 }
             },
             dismissButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         departmentName = ""
                         createDepartment = false
                     },
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= darkBackground)
                 }
             }
+            , containerColor = darkBackground
         )
     }
 }
@@ -716,7 +752,7 @@ fun DeleteDepartment(repo: Repository) {
 
     Row(
         modifier = Modifier
-            .background(Color(0x666790a4), shape = RoundedCornerShape(15.dp))
+            .background(lightpurple, shape = RoundedCornerShape(15.dp))
             .border(2.dp, Color(0xFFF0F8FF), shape = RoundedCornerShape(15.dp))
             .fillMaxWidth()
             .padding(10.dp)
@@ -729,18 +765,19 @@ fun DeleteDepartment(repo: Repository) {
             text = "Delete Department",
             fontSize = 20.sp,
             textAlign = TextAlign.Left,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color= darkBackground
         )
     }
 
     if (deleteDepartment) {
         AlertDialog(
             onDismissRequest = { deleteDepartment = false },
-            title = { Text("Delete Department", fontWeight = FontWeight.Bold) },
+            title = { Text("Delete Department", fontWeight = FontWeight.Bold,color= lightpurple) },
             text = {
                 Column(
                     modifier = Modifier
-                        .background(Color(0x336650a4), shape = RoundedCornerShape(20.dp))
+                        .background(lightpurple, shape = RoundedCornerShape(20.dp))
                         .padding(5.dp, top = 10.dp, bottom = 10.dp)
                 ) {
                     Row(
@@ -753,7 +790,7 @@ fun DeleteDepartment(repo: Repository) {
                             text = "Enter Department:",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),color= darkBackground
                         )
                         Text(
                             text = departmentName.takeIf { it.isNotBlank() } ?: "Select Department",
@@ -764,7 +801,7 @@ fun DeleteDepartment(repo: Repository) {
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White)
+                            .background(lightpurple)
                     ) {
                         departments.forEach { department ->
                             DropdownMenuItem(text = { Text(department.name) },
@@ -779,7 +816,9 @@ fun DeleteDepartment(repo: Repository) {
                 }
             },
             confirmButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         coroutineScope.launch {
                             repo.deleteDepartmentById(selectedDepartment!!.id)
@@ -788,19 +827,22 @@ fun DeleteDepartment(repo: Repository) {
                         deleteDepartment = false
                     }
                 ) {
-                    Text("Delete")
+                    Text("Delete",color= darkBackground)
                 }
             },
             dismissButton = {
-                Button(
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
                     onClick = {
                         selectedDepartment = null
                         deleteDepartment = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text("Cancel",color= darkBackground)
                 }
             }
+            , containerColor = darkBackground
         )
     }
 }

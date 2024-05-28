@@ -131,7 +131,12 @@ fun TaskItem(
             Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing between buttons
             if(task.isHelp == HelpType.Requested && employeeRole == Role.MANAGER && showButtons){
                 Row {
-                    Button(onClick = {
+
+
+                    Button( colors = ButtonDefaults.buttonColors(
+                            containerColor = lightpurple
+                        ),
+                        onClick = {
                         coroutineScope.launch {
                             task.isHelp = HelpType.Confirmed
                             task.status = TaskStatus.OPEN
@@ -140,10 +145,12 @@ fun TaskItem(
                         showButtons = false
                     }
                     ) {
-                        Text("Confirm")
+                        Text("Confirm", color= darkBackground)
                     }
                     Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing between buttons
-                    Button(
+                    Button( colors = ButtonDefaults.buttonColors(
+                        containerColor = lightpurple
+                    ),
                         onClick = {
                             coroutineScope.launch {
                                 task.isHelp = HelpType.Rejected
@@ -152,7 +159,7 @@ fun TaskItem(
                             showButtons = false
                         }
                     ) {
-                        Text("Reject")
+                        Text("Reject", color= darkBackground)
                     }
                 }
             }

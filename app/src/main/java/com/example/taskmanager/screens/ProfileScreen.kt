@@ -169,7 +169,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "Points Icon",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(21.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
 
