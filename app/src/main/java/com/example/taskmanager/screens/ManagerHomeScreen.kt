@@ -5,12 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -62,6 +65,7 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
 
     var openTasks by remember { mutableStateOf(emptyList<Task>()) }
     var activeTasks by remember { mutableStateOf(emptyList<Task>()) }
+    var showHelpAbout by remember { mutableStateOf(false) }
 
     fun refreshTasks() {
         coroutineScope.launch {
@@ -85,13 +89,18 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
 
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(180.dp)
+
         ) {
             Button(  colors = ButtonDefaults.buttonColors(
                 containerColor = darkBackground
             ),
                 onClick = { setShowNotification(true) }) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = null)
+            }
+            Spacer(Modifier.width(10.dp))
+            Button( colors = ButtonDefaults.buttonColors(containerColor = darkBackground),
+                onClick = { showHelpAbout = true }) {
+                Icon(imageVector = Icons.Default.Info, contentDescription = null)
             }
         }
 
@@ -276,4 +285,38 @@ fun ManagerHomeScreen(repo: Repository, managerId: Int) {
     if (showNotification) {
         NotificationScreen(onClose = { setShowNotification(false) }, repo = repo, employeeId = managerId)
     }
+
+    if (showHelpAbout) {
+        AlertDialog(
+            onDismissRequest = { showHelpAbout = false },
+            title = { Row{
+                Text("How to use Task Manager", color = lightgray ,fontWeight = FontWeight.ExtraBold, fontStyle = FontStyle(10))
+                Spacer(modifier = Modifier.width(30.dp))
+            } },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row { Text("- + (Add) button for creating new task.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- Click on tasks in order to see the detailed information about it.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- Press take task to take the task and its status becomes ACTIVE.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- Notifications can be viewed by clicking its button.",color= lightpurple) } // This should be dynamically calculated
+                    Row { Text("- For each task staff submit they earned point and leaderboard is updated.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- In each month all of the staff points are set to 0", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- Recommendations are send to the managers when month ends.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- From staffs profile staff can ask help and managers can confirm or reject them from their homepage's active task pool.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                    Row { Text("- For further questions reach out taskmanager@gmail.com.", fontWeight = FontWeight.Bold,color= lightpurple) }
+                }
+            },
+            confirmButton = {
+
+
+            },
+            dismissButton = {
+                Button(colors = ButtonDefaults.buttonColors(
+                    containerColor = lightpurple
+                ),
+                    onClick = { showHelpAbout = false }) { Text("Close" ,color= darkBackground) }
+            },  containerColor = darkBackground
+        )
+    }
+
 }

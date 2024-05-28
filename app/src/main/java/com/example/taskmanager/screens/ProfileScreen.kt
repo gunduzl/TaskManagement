@@ -92,7 +92,7 @@ fun ProfileScreen(repo: Repository, employeeId: Int, navController: NavControlle
     ) {
         LazyColumn {
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(187.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(175.dp)) {
                     Button(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = darkBackground
