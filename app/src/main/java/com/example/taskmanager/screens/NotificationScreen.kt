@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +55,13 @@ fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
         }
     }
 
+    val onDelete: (Notification) -> Unit = { notification ->
+        coroutineScope.launch {
+            repo.deleteNotification(notification)
+            notificationsList.value = notificationsList.value.filter { it.id != notification.id }
+        }
+    }
+
     if (alertDialogState.value) {
         AlertDialog(
             onDismissRequest = { alertDialogState.value = false },
@@ -63,7 +74,7 @@ fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
                 )
             },
             text = {
-                Notifications(notificationsList.value)
+                Notifications(notificationsList.value, onDelete)
             },
             confirmButton = {
                 Button(
@@ -77,32 +88,32 @@ fun NotificationScreen(repo: Repository, employeeId: Int, onClose: () -> Unit) {
                 ) {
                     Text("Close", color = darkBackground)
                 }
-            }
-            , containerColor = darkBackground // Custom background color
+            },
+            containerColor = darkBackground // Custom background color
         )
     }
 }
 
 @Composable
-fun Notifications(notifications: List<Notification>) {
+fun Notifications(notifications: List<Notification>, onDelete: (Notification) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(notifications) { notification ->
-            NotificationItem(notification)
+            NotificationItem(notification, onDelete)
             Spacer(modifier = Modifier.height(5.dp))
         }
     }
 }
 
 @Composable
-fun NotificationItem(notification: Notification) {
+fun NotificationItem(notification: Notification, onDelete: (Notification) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 2.dp, vertical = 8.dp)
             .border(2.dp, lightgray, shape = RoundedCornerShape(10.dp))
-            .background(lightpurple,shape = RoundedCornerShape(10.dp))
+            .background(lightpurple, shape = RoundedCornerShape(10.dp))
             .clickable { },
         horizontalAlignment = Alignment.Start
     ) {
@@ -110,7 +121,7 @@ fun NotificationItem(notification: Notification) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-        ){
+        ) {
             Text(
                 text = notification.title,
                 fontSize = 20.sp,
@@ -126,12 +137,19 @@ fun NotificationItem(notification: Notification) {
             Spacer(modifier = Modifier.height(5.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = " ${notification.date}",
+                    text = notification.date,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Right
+                )
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Read Notification",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onDelete(notification) }
                 )
             }
         }

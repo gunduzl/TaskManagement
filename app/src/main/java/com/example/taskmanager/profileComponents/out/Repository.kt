@@ -53,11 +53,33 @@ class Repository {
         // Create Tasks
         taskList.addAll(
             listOf(
-                // Ali
+                // Existing Tasks
                 Task(1, "Database Methods", "Database methods should be written.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 5),
                 Task(2, "Handle Exceptions", "Exception Library should be written.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 6),
-                Task(3, "Unit Test", "New Unit Tests Are Expected", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 7),
-                Task(4, "Test Security", "Corner Cases Should Be Tested", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 2, 8)
+                Task(3, "Unit Test", "New Unit Tests Are Expected", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 7),
+                Task(4, "Test Security", "Corner Cases Should Be Tested", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2022-12-31 23:59:59", 1, 8),
+                Task(5, "Develop UI", "User interface should be developed.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2023-01-31 23:59:59", 1, 6),
+                Task(6, "Optimize Performance", "Performance optimization tasks.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2023-02-28 23:59:59", 1, 7),
+                Task(7, "Fix Bugs", "Existing bugs should be fixed.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2023-03-31 23:59:59", 1, 4),
+                Task(8, "Code Review", "Code review for the project.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2023-04-30 23:59:59", 1, 5),
+                Task(9, "Implement Authentication", "Authentication module implementation.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2023-05-31 23:59:59", 2, 8),
+                Task(10, "Update Documentation", "Project documentation should be updated.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2023-06-30 23:59:59", 2, 3),
+
+                // New Tasks
+                Task(11, "Integrate API", "Integrate third-party API for data.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2023-07-31 23:59:59", 2, 6),
+                Task(12, "Improve UX", "Enhance the user experience on the platform.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2023-08-31 23:59:59", 2, 7),
+                Task(13, "Write Unit Tests", "Create unit tests for new features.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2023-09-30 23:59:59", 2, 4),
+                Task(14, "Set Up CI/CD", "Continuous integration and delivery setup.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2023-10-31 23:59:59", 2, 5),
+                Task(15, "Design Database Schema", "Design the schema for the new database.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2023-11-30 23:59:59", 2, 8),
+                Task(16, "Implement Caching", "Add caching to improve performance.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2023-12-31 23:59:59", 2, 3),
+                Task(17, "Perform Load Testing", "Test system performance under load.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2024-01-31 23:59:59", 3, 6),
+                Task(18, "Develop Mobile App", "Create a mobile application.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2024-02-29 23:59:59", 3, 7),
+                Task(19, "Optimize Queries", "Optimize SQL queries for performance.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2024-03-31 23:59:59", 3, 4),
+                Task(20, "Implement Logging", "Add logging for monitoring purposes.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2024-04-30 23:59:59", 3, 5),
+                Task(21, "Design Landing Page", "Create a landing page for the website.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2024-05-31 23:59:59", 3, 8),
+                Task(22, "Create API Documentation", "Document the APIs.", TaskStatus.OPEN, TaskDifficulty.LOW, HelpType.Default, System.currentTimeMillis(), "2024-06-30 23:59:59", 3, 3),
+                Task(23, "Implement Security Patches", "Apply security patches to the system.", TaskStatus.OPEN, TaskDifficulty.MEDIUM, HelpType.Default, System.currentTimeMillis(), "2024-07-31 23:59:59", 3, 6),
+                Task(24, "Improve Accessibility", "Ensure accessibility standards are met.", TaskStatus.OPEN, TaskDifficulty.HIGH, HelpType.Default, System.currentTimeMillis(), "2024-08-31 23:59:59", 3, 7)
             )
         )
 
@@ -290,6 +312,37 @@ class Repository {
         return employeeList.filterIsInstance<Employee>().find { it.id == employeeId }
     }
 
+    suspend fun submitTask(staffID: Int, taskID: Int) = mutex.withLock {
+        val staff = employeeList.filterIsInstance<Staff>().find { it.id == staffID } ?: return
+        val taskIndex = taskList.indexOfFirst { it.id == taskID }
+        if (taskIndex != -1) {
+            val task = taskList[taskIndex]
+            if (task.owners.any { it.id == staffID }) {
+                task.status = TaskStatus.CLOSED
+                taskList[taskIndex] = task
+
+                // Check if all tasks for this staff are closed
+                val staffTasks = taskList.filter { it.owners.any { owner -> owner.id == staffID } }
+                if (staffTasks.all { it.status == TaskStatus.CLOSED }) {
+                    staff.staffStatus = StaffStatus.AVAILABLE
+                    val staffIndex = employeeList.indexOfFirst { it.id == staffID }
+                    if (staffIndex != -1) {
+                        employeeList[staffIndex] = staff
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun deleteTask(taskID: Int) = mutex.withLock {
+        val taskIndex = taskList.indexOfFirst { it.id == taskID }
+        if (taskIndex != -1) {
+            taskList.removeAt(taskIndex)
+        }
+    }
+
+
+
     suspend fun insertTask(task: Task) = mutex.withLock {
         val creationTime = System.currentTimeMillis()
         val newTask = task.copy(creationTime = creationTime)
@@ -306,22 +359,6 @@ class Repository {
         }, delay)
     }
 
-    private fun sendTaskDeadlineNotification(task: Task) {
-        val relatedStaff = task.owners
-        relatedStaff.forEach { staff ->
-            val notification = Notification(
-                id = generateNotificationId(),
-                title = "Task Deadline Reached",
-                description = "The deadline for task '${task.title}' has been reached.",
-                date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
-                employeeType = Role.STAFF,
-                employeeId = staff.id
-            )
-            runBlocking {
-                insertNotification(notification)
-            }
-        }
-    }
 
     suspend fun insertTaskStaffCrossRef(crossRef: TaskStaffCrossRef) = mutex.withLock {
         taskStaffCrossRefList.add(crossRef)
@@ -372,6 +409,13 @@ class Repository {
             val updatedOwners = task.owners.toMutableList().apply { add(staff) }
             val updatedTask = task.copy(status = TaskStatus.ACTIVE, owners = updatedOwners)
             taskList[taskIndex] = updatedTask
+            // Update staff status to BUSY
+            staff.staffStatus = StaffStatus.BUSY
+            // Update the staff in the employee list
+            val staffIndex = employeeList.indexOfFirst { it.id == staffID }
+            if (staffIndex != -1) {
+                employeeList[staffIndex] = staff
+            }
             scheduleTaskDeadlineNotification(updatedTask)
         }
     }
@@ -389,6 +433,25 @@ class Repository {
         if (taskIndex != -1) {
             val task = taskList[taskIndex]
             taskList[taskIndex] = task.copy(status = newStatus)
+        }
+    }
+
+    private fun sendTaskDeadlineNotification(task: Task) {
+        if (task.status==TaskStatus.OPEN) {
+            val relatedStaff = task.owners
+            relatedStaff.forEach { staff ->
+                val notification = Notification(
+                    id = generateNotificationId(),
+                    title = "Task Deadline Reached",
+                    description = "The deadline for task '${task.title}' has been reached.",
+                    date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date()),
+                    employeeType = Role.STAFF,
+                    employeeId = staff.id
+                )
+                runBlocking {
+                    insertNotification(notification)
+                }
+            }
         }
     }
 
@@ -481,6 +544,11 @@ class Repository {
             notificationList.add(notification)
         }
     }
+
+    suspend fun deleteNotification(notification: Notification) = mutex.withLock {
+        notificationList.removeIf { it.id == notification.id }
+    }
+
 
     suspend fun deleteDepartmentByName(departmentName: String) = mutex.withLock {
         val departmentToDelete = departmentList.find { it.name == departmentName }

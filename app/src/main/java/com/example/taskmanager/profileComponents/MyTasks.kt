@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +42,6 @@ import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Task
 import com.example.taskmanager.profileComponents.out.TaskStatus
 import com.example.taskmanager.profileComponents.out.TaskWithStaff
-import com.example.taskmanager.systems.EvaluationSystem
 import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.gray
 import com.example.taskmanager.ui.theme.lightgray
@@ -52,9 +52,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyTasks(repo: Repository, staffId: Int) {
     val tasks = remember { mutableStateOf<List<TaskWithStaff>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(staffId) {
-        tasks.value = repo.getTaskFromStaff(staffId)
+        coroutineScope.launch {
+            tasks.value = repo.getTaskFromStaff(staffId)
+        }
     }
 
     MaterialTheme {
@@ -82,16 +85,25 @@ fun MyTasks(repo: Repository, staffId: Int) {
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     items(tasks.value) { taskWithStaff ->
-                        TaskItem(taskWithStaff.task, taskWithStaff.staff.map { it.name })
+                        TaskItem(taskWithStaff.task, taskWithStaff.staff.map { it.name }, repo, staffId) {
+                            coroutineScope.launch {
+                                tasks.value = repo.getTaskFromStaff(staffId) // Refresh tasks list
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
-
 @Composable
-fun TaskItem(task: Task, staffNames: List<String>) {
+fun TaskItem(
+    task: Task,
+    staffNames: List<String>,
+    repo: Repository,
+    staffId: Int,
+    onTaskDeleted: suspend () -> Unit
+) {
     val statusColor = when (task.status) {
         TaskStatus.CLOSED -> Color.White
         TaskStatus.ACTIVE -> darkBackground
@@ -107,7 +119,6 @@ fun TaskItem(task: Task, staffNames: List<String>) {
     val showDialog = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,7 +132,7 @@ fun TaskItem(task: Task, staffNames: List<String>) {
             text = task.title,
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp,
-            color= lightgray
+            color = lightgray
         )
         icon?.let {
             Icon(
@@ -141,84 +152,84 @@ fun TaskItem(task: Task, staffNames: List<String>) {
         } else {
             if (staffNames.isNotEmpty()) {
                 Row {
-                    /*
-                    Text(
-                        text = "Assigned to ${staffNames.joinToString()}",
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, end = 8.dp)
-                    )
-                    */
-
-                    Button( colors = ButtonDefaults.buttonColors(containerColor = lightgray),
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = lightgray),
                         onClick = {
                             coroutineScope.launch {
-                                task.status = TaskStatus.CLOSED
-                                val staffs = task.owners
-                                val managerId = staffs[0].departmentManagerId
-                                for (staff in staffs) {
-                                    EvaluationSystem().evaluatePointFromTask(staff, task)
-
-                                }
-                                val manager = Repository().getManagerById(managerId)
-                                if(manager != null){
-                                    EvaluationSystem().evaluateManagerPoint(manager)
-                                }
-
-                                showDialog.value= true
+                                repo.submitTask(staffId, task.id)
+                                showDialog.value = true
                             }
                         },
                     ) {
-                        Text("Submit",color= darkBackground)
+                        Text("Submit", color = darkBackground)
                     }
-
                 }
-
-
             }
         }
-
     }
 
     // Alert Dialog
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
-            title = { Text("Task Details", fontWeight = FontWeight.Bold,color= lightpurple) },
+            title = { Text("Task Details", fontWeight = FontWeight.Bold, color = lightpurple) },
             text = {
                 Column {
-                    Text(text = "Task Name: ${task.title}",color= lightgray)
-                    Text(text = "Status: ${task.status}",color= lightgray)
+                    Text(text = "Task Name: ${task.title}", color = lightgray)
+                    Text(text = "Status: ${task.status}", color = lightgray)
                     staffNames.forEach { staffName ->
-                        Text(text = "Assigned to: $staffName",color= lightgray)
+                        Text(text = "Assigned to: $staffName", color = lightgray)
                     }
                 }
             },
             confirmButton = {
                 if (task.status == TaskStatus.ACTIVE) {
-                    Button( colors = ButtonDefaults.buttonColors(
-                        containerColor = lightpurple
-                    ),
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = lightpurple),
                         onClick = {
                             coroutineScope.launch {
                                 task.isHelp = HelpType.Requested
                                 showDialog.value = false
                             }
-
                         }
                     ) {
-                        Text("Ask Help",color= gray)
+                        Text("Ask Help", color = gray)
                     }
                 }
             },
             dismissButton = {
-                Button( colors = ButtonDefaults.buttonColors(
-                    containerColor = lightpurple
-                ),
-                    onClick = { showDialog.value = false },
-                ) {
-                    Text("Cancel",color= gray)
+                if (task.status == TaskStatus.CLOSED) {
+                    Row {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = lightpurple),
+                            onClick = {
+                                coroutineScope.launch {
+                                    repo.deleteTask(task.id)
+                                    onTaskDeleted() // Refresh tasks list
+                                    showDialog.value = false
+                                }
+                            }
+                        ) {
+                            Text("Delete", color = gray)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = lightpurple),
+                            onClick = { showDialog.value = false },
+                        ) {
+                            Text("Cancel", color = gray)
+                        }
+                    }
+                } else {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = lightpurple),
+                        onClick = { showDialog.value = false },
+                    ) {
+                        Text("Cancel", color = gray)
+                    }
                 }
-            }, containerColor = darkBackground
+            },
+            containerColor = darkBackground
         )
     }
 }

@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,11 +33,10 @@ import androidx.compose.ui.unit.sp
 import com.example.taskmanager.profileComponents.out.Repository
 import com.example.taskmanager.profileComponents.out.Staff
 import com.example.taskmanager.profileComponents.out.StaffStatus
-import com.example.taskmanager.ui.theme.customGreen
-import com.example.taskmanager.ui.theme.customPurple
 import com.example.taskmanager.ui.theme.darkBackground
 import com.example.taskmanager.ui.theme.light
 import com.example.taskmanager.ui.theme.lightgray
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,9 +46,11 @@ fun MyTeam(repo: Repository, managerId: Int) {
 
     LaunchedEffect(managerId) {
         coroutineScope.launch {
-            val managerWithStaff = repo.getManagerWithStaff(managerId)
-            staffList.value = managerWithStaff.firstOrNull()?.staff ?: emptyList()
-            println("Manager ID: $managerId, Staff List: ${staffList.value}")
+            while (true) {
+                val managerWithStaff = repo.getManagerWithStaff(managerId)
+                staffList.value = managerWithStaff.firstOrNull()?.staff ?: emptyList()
+                delay(1000) // Refresh every second
+            }
         }
     }
 
@@ -90,7 +90,7 @@ fun MyTeam(repo: Repository, managerId: Int) {
 
 @Composable
 fun StaffItem(staff: Staff) {
-    val statusColor = if (staff.staffStatus == StaffStatus.BUSY)  darkBackground else light
+    val statusColor = if (staff.staffStatus == StaffStatus.BUSY) darkBackground else light
 
     val showDialog = remember { mutableStateOf(false) }
 
@@ -106,21 +106,14 @@ fun StaffItem(staff: Staff) {
         Text(
             text = staff.name,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color = if (staff.staffStatus == StaffStatus.AVAILABLE) darkBackground else lightgray
         )
-        if (staff.staffStatus == StaffStatus.AVAILABLE) {
-            Text(
-                text = "Available",
-                fontStyle = FontStyle.Italic,
-                color = darkBackground
-            )
-        } else {
-            Text(
-                text = "Busy",
-                fontStyle = FontStyle.Italic,
-                color = lightgray
-            )
-        }
+        Text(
+            text = if (staff.staffStatus == StaffStatus.AVAILABLE) "Available" else "Busy",
+            fontStyle = FontStyle.Italic,
+            color = if (staff.staffStatus == StaffStatus.AVAILABLE) darkBackground else lightgray
+        )
     }
 
     if (showDialog.value) {
